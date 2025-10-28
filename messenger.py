@@ -41,7 +41,11 @@ elif choice == 'c':
     groupid = int(input("Pour voir les messages d'un groupe, donnez son id:"))
     for mess in server['messages']: 
         if mess['channel'] == groupid:
-            print(mess['content'])
+            sender_id = mess['sender_id']
+            for user in server['users']:
+                if sender_id == user['id']:
+                    sender = user['name']
+            print(sender, mess['content'])
 
 else:
     print('Unknown option:', choice)
