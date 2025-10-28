@@ -98,5 +98,5 @@ def channels():
 
 
 
-
+#on appelle la fonction globale
 menu_principal()
