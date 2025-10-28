@@ -84,10 +84,13 @@ def channels():
                     if sender_id == user['id']:
                         sender = user['name']
                 print(sender,':', mess['content'])
+        print()
         channels()
 
     elif choice3 == 'a':
         print('pas encore codé ;)')
+        print()
+        channels()
 
     elif choice3=='r':
         menu_principal()
