@@ -21,14 +21,27 @@ server = {
 
 print('=== Messenger ===')
 print('x. Leave')
-print('y. utilisateurs')
-print('z. channels')
+print('u. utilisateurs')
+print('c. channels')
 choice = input('Select an option: ')
+
 if choice == 'x':
     print('Bye!')
-if choice == 'y':
-    print(server['users'])
-if choice == 'z':
-    print(server['channels'])
+
+elif choice == 'u':
+    print("===User list===")
+    for user in server['users']:
+        print(user['id'], user['name'])
+
+elif choice == 'c':
+    print("===Channel list===")
+    for channel in server['channels']:
+        print(channel['id'], channel['name'])
+    
+    groupid = int(input("Pour voir les messages d'un groupe, donnez son id:"))
+    for mess in server['messages']: 
+        if mess['channel'] == groupid:
+            print(mess['content'])
+
 else:
     print('Unknown option:', choice)
