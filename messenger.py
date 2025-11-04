@@ -6,6 +6,11 @@ import json
 with open("server.json", "r", encoding="utf-8") as f:
     server = json.load(f)
 
+#fonction de sauvegarde
+def save():
+    with open("server.json", "w", encoding = "utf-8") as f:
+        json.dump(server, f, ensure_ascii=False, indent=2)
+
 
 #Fonctions pour l'automatisation du choix des identifiants
 
@@ -106,6 +111,7 @@ def ajout_utilisateur():
     newid = random.choice(get_userid_available())
     newname = input("new user name?")
     server['users'].append({'id': newid, 'name': newname})
+    save()
 
 
 def ajout_channel():
@@ -124,7 +130,8 @@ def ajout_channel():
         for user in server['users']:
             if user['name'] in newmembers:
                 new_member_ids.append(user['id'])
-        server['channels'].append({'id': newid, 'name': newname, 'member_ids': new_member_ids})    
+        server['channels'].append({'id': newid, 'name': newname, 'member_ids': new_member_ids})
+    save()
 
 
 #on appelle la fonction globale
