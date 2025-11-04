@@ -1,16 +1,26 @@
 from datetime import datetime
 import random
+import json
 
-#Définition initiale du serveur
+# Définition initiale du serveur
+with open("server.json", "r", encoding="utf-8") as f:
+    server = json.load(f)
 
+
+#Fonctions pour l'automatisation du choix des identifiants
+
+def get_userid_available():
+    userid_taken = {user['id'] for user in server['users']}
+    return [i for i in range(50) if i not in userid_taken]
+
+
+def get_channelid_available():
+    channelid_taken = {channel['id'] for channel in server['channels']}
+    return [i for i in range(50) if i not in channelid_taken]
 
 ##Fonctions de navigation
 
 def menu_principal():
-    userid_taken = {user['id'] for user in server['users']}
-    userid_available = [i for i in range (50) if i not in userid_taken]
-    channelid_taken = {channel['id'] for channel in server['channels']}
-    channelid_available = [i for i in range (50) if i not in channelid_taken]
     print('=== Messenger ===')
     print('x. Leave')
     print('u. utilisateurs')
@@ -18,7 +28,7 @@ def menu_principal():
     choice = input('Select an option: ')
 
     if choice == 'x':
-        print('Bye!')
+        return('Bye!')
 
     elif choice == 'u':
         utilisateurs()
@@ -42,6 +52,7 @@ def utilisateurs():
 
     if choice2 == 'a':
         ajout_utilisateur()
+        utilisateurs()
 
     if choice2 == 'r':
         menu_principal()
@@ -63,7 +74,7 @@ def channels():
     choice3 = input('Select an option: ')
     
     if choice3 == 'x':
-        print('Bye!')
+        return('Bye!')
 
     elif choice3=='m':
         groupid = int(input("id du groupe:"))
@@ -88,17 +99,18 @@ def channels():
         print('Unknown option')
         channels()
 
+
+##Fonctions d'ajout
+
 def ajout_utilisateur():
-    newid = random.choice(userid_available)
+    newid = random.choice(get_userid_available())
     newname = input("new user name?")
     server['users'].append({'id': newid, 'name': newname})
-    userid_available.pop(newid)
-    utilisateurs()
+
 
 def ajout_channel():
     newname = input("new channel name?")
-    newid = random.choice(channelid_available)
-    channelid_available.pop(newid)
+    newid = random.choice(get_channelid_available())
     newmembers = input("member names? Example: user_name1, user_name2, user_name3")
     newmembers = [name.strip() for name in newmembers.split(',')]
     existing_names=[user['name'] for user in server['users']]
