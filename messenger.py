@@ -51,7 +51,6 @@ def menu_principal():
     elif choice == 'c':
         channels()
         
-
     else:
         print('Unknown option')
         menu_principal()
@@ -67,11 +66,7 @@ def utilisateurs():
     choice2 = input('Select an option: ')
 
     if choice2 == 'a':
-        newid = random.choice(userid_available)
-        newname = input("new user name?")
-        server['users'].append({'id': newid, 'name': newname})
-        userid_available.pop(newid)
-        utilisateurs()
+        ajout_utilisateur()
 
     if choice2 == 'r':
         menu_principal()
@@ -79,6 +74,7 @@ def utilisateurs():
     else:
         print('Unknown option')
         utilisateurs()
+
 
 def channels():
     print("===Channel list===")
@@ -107,12 +103,7 @@ def channels():
         channels()
 
     elif choice3 == 'a':
-        newname = input("new channel name?")
-        newid = random.choice(channelid_available)
-        newmembers = input("member names? Example: user_name1, user_name2, user_name3")
-        newmembers = [name.strip() for name in newmembers.split(',')]
-        server['channels'].append({'id': newid, 'name': newname, 'member_ids': []})
-        channelid_available.pop(newid)
+        ajout_channel()
         channels()
 
     elif choice3=='r':
@@ -122,6 +113,31 @@ def channels():
         print('Unknown option')
         channels()
 
+def ajout_utilisateur():
+    newid = random.choice(userid_available)
+    newname = input("new user name?")
+    server['users'].append({'id': newid, 'name': newname})
+    userid_available.pop(newid)
+    utilisateurs()
+
+def ajout_channel():
+    newname = input("new channel name?")
+    newid = random.choice(channelid_available)
+    channelid_available.pop(newid)
+    newmembers = input("member names? Example: user_name1, user_name2, user_name3")
+    newmembers = [name.strip() for name in newmembers.split(',')]
+    existing_names=[user['name'] for user in server['users']]
+    flag=True
+    for newmember in newmembers:
+        if newmember not in existing_names:
+            print(f'{newmember} is not in the server')
+            flag=False
+    if flag:
+        new_member_ids=[]
+        for user in server['users']:
+            if user['name'] in newmembers:
+                new_member_ids.append(user['id'])
+        server['channels'].append({'id': newid, 'name': newname, 'member_ids': new_member_ids})    
 
 
 #on appelle la fonction globale
