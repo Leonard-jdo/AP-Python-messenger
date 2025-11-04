@@ -21,21 +21,13 @@ server = {
     ]
 }
 
-##Définitions initiales des id
-
-#id des membres
-userid_taken = {user['id'] for user in server['users']}
-userid_available = [i for i in range (50) if i not in userid_taken]
-
-#id des channels
-channelid_taken = {channel['id'] for channel in server['channels']}
-channelid_available = [i for i in range (50) if i not in channelid_taken]
-
-
-
 ##Fonctions de navigation
 
 def menu_principal():
+    userid_taken = {user['id'] for user in server['users']}
+    userid_available = [i for i in range (50) if i not in userid_taken]
+    channelid_taken = {channel['id'] for channel in server['channels']}
+    channelid_available = [i for i in range (50) if i not in channelid_taken]
     print('=== Messenger ===')
     print('x. Leave')
     print('u. utilisateurs')

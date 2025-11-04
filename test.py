@@ -22,6 +22,6 @@ server = {
     ]
 }
 
-taken = {user['id'] for user in server['users']}
-userid_available = [i for i in range (50) if i not in taken]
-print(random.choice(userid_available))
+newmembers = input("member names - (Example: user_name1, user_name2, user_name3) ?")
+newmembers = [name.strip() for name in newmembers.split(',')]
+print(newmembers)
