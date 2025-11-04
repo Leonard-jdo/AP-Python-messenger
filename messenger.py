@@ -131,7 +131,14 @@ def ajout_channel():
             if user['name'] in newmembers:
                 new_member_ids.append(user['id'])
         server['channels'].append({'id': newid, 'name': newname, 'member_ids': new_member_ids})
-    save()
+        save()
+    else:
+        choice = input("voulez vous ajouter ce(s) utilisateurs (oui/non)?")
+        if choice == "oui":
+            ajout_utilisateur()
+            utilisateurs()
+        elif choice == "non":
+            channels()
 
 
 #on appelle la fonction globale

@@ -11,6 +11,22 @@
     {
       "id": 34,
       "name": "Charlie"
+    },
+    {
+      "id": 37,
+      "name": "fezough"
+    },
+    {
+      "id": 36,
+      "name": "feiaugfiaug"
+    },
+    {
+      "id": 22,
+      "name": "fze"
+    },
+    {
+      "id": 24,
+      "name": "foeugfzui"
     }
   ],
   "channels": [
@@ -20,6 +36,21 @@
       "member_ids": [
         41,
         23
+      ]
+    },
+    {
+      "id": 22,
+      "name": "fezkuig",
+      "member_ids": [
+        41,
+        23
+      ]
+    },
+    {
+      "id": 44,
+      "name": "fze",
+      "member_ids": [
+        22
       ]
     }
   ],
