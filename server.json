@@ -9,7 +9,7 @@
     "messages": [
         {
         "id": 18,
-        "reception_date": 04/11/2025,
+        "reception_date": "04,11,2025",
         "sender_id": 41,
         "channel": 12,
         "content": "Hi 👋"
