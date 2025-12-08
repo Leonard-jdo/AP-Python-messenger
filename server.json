@@ -13,20 +13,8 @@
       "name": "Charlie"
     },
     {
-      "id": 37,
-      "name": "fezough"
-    },
-    {
-      "id": 36,
-      "name": "feiaugfiaug"
-    },
-    {
-      "id": 22,
-      "name": "fze"
-    },
-    {
-      "id": 24,
-      "name": "foeugfzui"
+      "id": 16,
+      "name": "Delta"
     }
   ],
   "channels": [
@@ -47,10 +35,12 @@
       ]
     },
     {
-      "id": 44,
-      "name": "fze",
+      "id": 2,
+      "name": "newchan",
       "member_ids": [
-        22
+        41,
+        23,
+        16
       ]
     }
   ],
