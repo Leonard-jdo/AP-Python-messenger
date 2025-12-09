@@ -1,9 +1,14 @@
-## Se renseigner pour les classes pour ne pas être perdu
+## Se renseigner sur les classes pour ne pas être perdu
 # Les 3 trucs à faire au niveau de json à modifier pour utiliser les classes:
 
 # Le chargement des données
 # L'utilisation des données
 # La sauvegarde des données
+
+# à faire la prochaine fois:
+# Tout passer en classes
+# Commenter tout le code pour la lisibilité
+# Améliorer l'interface d'affichage 
 
 
 from datetime import datetime
