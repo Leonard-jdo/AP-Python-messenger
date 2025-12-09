@@ -53,6 +53,14 @@
         23,
         16
       ]
+    },
+    {
+      "id": 28,
+      "name": "alice_echo",
+      "member_ids": [
+        41,
+        6
+      ]
     }
   ],
   "messages": [

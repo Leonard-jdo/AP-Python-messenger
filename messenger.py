@@ -23,6 +23,10 @@ def get_channelid_available():
     channelid_taken = {channel['id'] for channel in server['channels']}
     return [i for i in range(50) if i not in channelid_taken]
 
+def get_messageid_available():
+    messageid_taken = {message['id'] for message in server['messages']}
+    return [i for i in range(50) if i not in messageid_taken]
+
 ##Fonctions de navigation
 
 
@@ -95,10 +99,10 @@ def utilisateurs():
 def channels():
     print("===Channel list===")
     for channel in server['channels']:        
-        if userlog['id'] in channel['member_ids']:
+        if userlog['id'] in channel['member_ids']:   #On affiche les channels dans lequel on est seulement
             print('id:',channel['id'],'| name:', channel['name'])
     print('------------------')
-    print("m :  accéder aux messages")
+    print("c :  accéder à un channel")
     print("a :  ajouter un channel")
     print("r :  revenir au menu principal")
     print('x :  leave')
@@ -107,8 +111,8 @@ def channels():
     if choice3 == 'x':
         return('Bye!')
 
-    elif choice3=='m':
-        groupid = int(input("id du groupe:"))
+    elif choice3=='c':
+        groupid = int(input("id du groupe désiré:"))
         for mess in server['messages']: 
             if mess['channel'] == groupid:
                 sender_id = mess['sender_id']
@@ -116,8 +120,23 @@ def channels():
                     if sender_id == user['id']:
                         sender = user['name']
                 print(sender,':', mess['content'])
-        print()
+        print('-----------------------')
+        print('e : écrire un message')
+        print('r : revenir aux channels')
+        choice4 = input('Select an option: ')
+
+        if choice4 == 'r':
+            channels()
+        
+        elif choice4 == 'e':
+            ajout_message(groupid)
+
+        else:
+            print('Unknown option')
+            channels()
+        
         channels()
+        
 
     elif choice3 == 'e':
         ajout_message()
@@ -148,8 +167,9 @@ def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
     newid = random.choice(get_channelid_available())
-    newmembers = input("member names? Example: user_name1, user_name2, user_name3")
+    newmembers = input("member names (other than you)? Example: user_name1, user_name2, user_name3")
     newmembers = [name.strip() for name in newmembers.split(',')]
+    newmembers.append(userlog['name'])
     existing_names=[user['name'] for user in server['users']]
     flag=True
     for newmember in newmembers:
@@ -171,8 +191,14 @@ def ajout_channel():
         elif choice == "non":
             channels()
 
-def ajout_message():
-    choice = input('Select an option: ')
+def ajout_message(groupid):
+    newmessage:str = input('nouveau message:')
+    server['messages'].append({"id":random.choice(get_messageid_available()),
+                                "reception_date": str(datetime.now().strftime("%d/%m/%Y %H:%M")),
+                                "sender_id": userlog['id'],
+                                "channel": groupid,
+                                "content": newmessage})
+    save()
 
 
 #on appelle la fonction globale
