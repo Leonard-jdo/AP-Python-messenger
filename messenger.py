@@ -2,11 +2,11 @@ from datetime import datetime
 import random
 import json
 
-# Définition initiale du serveur
+# Définition initiale du serveur avec json
 with open("server.json", "r", encoding="utf-8") as f:
     server = json.load(f)
 
-#fonction de sauvegarde
+#fonction de sauvegarde du json
 def save():
     with open("server.json", "w", encoding = "utf-8") as f:
         json.dump(server, f, ensure_ascii=False, indent=2)
@@ -24,6 +24,32 @@ def get_channelid_available():
     return [i for i in range(50) if i not in channelid_taken]
 
 ##Fonctions de navigation
+
+
+def acceuil():
+    login = False
+    print('=== Bienvenue dans la messagerie ===')
+    print('liste des utilisateurs:')
+    for user in server['users']:
+        print(user['id'], user['name'])
+    print('---------------------------------')
+    print('Renseignez votre nom pour vous connecter.')
+    print("n: je n'ai pas encore de profil")
+    choice = input("Nom (ou 'n'):")
+    if choice == 'n':
+        ajout_utilisateur()
+        acceuil()
+    else:
+        for user in server['users']:
+            if choice == user['name']:
+                login = True
+                print(f"Connecté en tant que {user['name']}!")
+                return(user)
+        if not login:
+            print("Cet utilisateur n'existe pas, veuillez corriger le nom ou l'ajouter")
+            acceuil()
+
+    
 
 def menu_principal():
     print('=== Messenger ===')
@@ -73,6 +99,7 @@ def channels():
         print('id:',channel['id'],'| name:', channel['name'])
     print('------------------')
     print("m :  lire les messages")
+    print("e :  envoyer un message")
     print("a :  ajouter un channel")
     print("r :  revenir au menu principal")
     print('x :  leave')
@@ -92,6 +119,9 @@ def channels():
                 print(sender,':', mess['content'])
         print()
         channels()
+
+    elif choice3 == 'e':
+        ajout_message()
 
     elif choice3 == 'a':
         ajout_channel()
@@ -140,6 +170,14 @@ def ajout_channel():
         elif choice == "non":
             channels()
 
+def ajout_message():
+    print("e :  envoyer un message")
+    print("a :  ajouter un channel")
+    print("r :  revenir au menu principal")
+    print('x :  leave')
+    choice3 = input('Select an option: ')
+
 
 #on appelle la fonction globale
+userlog = acceuil()
 menu_principal()
