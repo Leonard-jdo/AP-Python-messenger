@@ -1,3 +1,11 @@
+## Se renseigner pour les classes pour ne pas être perdu
+# Les 3 trucs à faire au niveau de json à modifier pour utiliser les classes:
+
+# Le chargement des données
+# L'utilisation des données
+# La sauvegarde des données
+
+
 from datetime import datetime
 import random
 import json
@@ -112,32 +120,14 @@ def channels():
         return('Bye!')
 
     elif choice3=='c':
-        groupid = int(input("id du groupe désiré:"))
-        for mess in server['messages']: 
-            if mess['channel'] == groupid:
-                sender_id = mess['sender_id']
-                for user in server['users']:
-                    if sender_id == user['id']:
-                        sender = user['name']
-                print(sender,':', mess['content'])
-        print('-----------------------')
-        print('e : écrire un message')
-        print('r : revenir aux channels')
-        choice4 = input('Select an option: ')
-
-        if choice4 == 'r':
-            channels()
-        
-        elif choice4 == 'e':
-            ajout_message(groupid)
-
+        channelid = int(input("id du channel désiré:"))
+        if channelid not in get_channelid_available(): 
+            in_channel(channelid)
         else:
-            print('Unknown option')
+            print("Ce groupe n'existe pas")
             channels()
         
-        channels()
         
-
     elif choice3 == 'e':
         ajout_message()
 
@@ -151,6 +141,33 @@ def channels():
     else:
         print('Unknown option')
         channels()
+
+# Fonction de navigation dans un channel
+
+def in_channel(channelid:int):
+    for mess in server['messages']: 
+            if mess['channel'] == channelid:
+                sender_id = mess['sender_id']
+                for user in server['users']:
+                    if sender_id == user['id']:
+                        sender = user['name']
+                print(mess['reception_date'], sender, ':', mess['content'])
+    print('-----------------------')
+    print('e : écrire un message')
+    print('r : revenir aux channels')
+    choice4 = input('Select an option: ')
+
+    if choice4 == 'r':
+        channels()
+    
+    elif choice4 == 'e':
+        ajout_message(channelid)
+
+    else:
+        print('Unknown option')
+        channels()
+    
+    channels()
 
 
 ##Fonctions d'ajout
@@ -191,14 +208,15 @@ def ajout_channel():
         elif choice == "non":
             channels()
 
-def ajout_message(groupid):
+def ajout_message(channelid):
     newmessage:str = input('nouveau message:')
     server['messages'].append({"id":random.choice(get_messageid_available()),
                                 "reception_date": str(datetime.now().strftime("%d/%m/%Y %H:%M")),
                                 "sender_id": userlog['id'],
-                                "channel": groupid,
+                                "channel": channelid,
                                 "content": newmessage})
     save()
+    in_channel(channelid)
 
 
 #on appelle la fonction globale

@@ -70,6 +70,20 @@
       "sender_id": 41,
       "channel": 12,
       "content": "Hi 👋"
+    },
+    {
+      "id": 32,
+      "reception_date": "09/12/2025 16:55",
+      "sender_id": 41,
+      "channel": 28,
+      "content": "nouveau message ouais ouais"
+    },
+    {
+      "id": 45,
+      "reception_date": "09/12/2025 16:55",
+      "sender_id": 41,
+      "channel": 28,
+      "content": "fmezouigfzeliugfzeilugfuizegf"
     }
   ]
 }
