@@ -27,7 +27,7 @@ def get_channelid_available():
 
 
 def acceuil():
-    login = False
+    login:bool = False
     print('=== Bienvenue dans la messagerie ===')
     print('liste des utilisateurs:')
     for user in server['users']:
@@ -46,17 +46,16 @@ def acceuil():
                 print(f"Connecté en tant que {user['name']}!")
                 return(user)
         if not login:
-            print("Cet utilisateur n'existe pas, veuillez corriger le nom ou l'ajouter")
+            print("Cet utilisateur n'existe pas, veuillez corriger son nom ou l'ajouter comme nouvel utilisateur")
             acceuil()
 
     
-
 def menu_principal():
     print('=== Messenger ===')
-    print('x. Leave')
     print('u. utilisateurs')
     print('c. channels')
-    choice = input('Select an option: ')
+    print('x. Leave')
+    choice:str = input('Select an option: ')
 
     if choice == 'x':
         return('Bye!')
@@ -95,11 +94,11 @@ def utilisateurs():
 
 def channels():
     print("===Channel list===")
-    for channel in server['channels']:
-        print('id:',channel['id'],'| name:', channel['name'])
+    for channel in server['channels']:        
+        if userlog['id'] in channel['member_ids']:
+            print('id:',channel['id'],'| name:', channel['name'])
     print('------------------')
-    print("m :  lire les messages")
-    print("e :  envoyer un message")
+    print("m :  accéder aux messages")
     print("a :  ajouter un channel")
     print("r :  revenir au menu principal")
     print('x :  leave')
@@ -138,6 +137,7 @@ def channels():
 ##Fonctions d'ajout
 
 def ajout_utilisateur():
+    print("ajout d'un utilisateur")
     newid = random.choice(get_userid_available())
     newname = input("new user name?")
     server['users'].append({'id': newid, 'name': newname})
@@ -145,6 +145,7 @@ def ajout_utilisateur():
 
 
 def ajout_channel():
+    print("ajout d'un channel")
     newname = input("new channel name?")
     newid = random.choice(get_channelid_available())
     newmembers = input("member names? Example: user_name1, user_name2, user_name3")
@@ -171,11 +172,7 @@ def ajout_channel():
             channels()
 
 def ajout_message():
-    print("e :  envoyer un message")
-    print("a :  ajouter un channel")
-    print("r :  revenir au menu principal")
-    print('x :  leave')
-    choice3 = input('Select an option: ')
+    choice = input('Select an option: ')
 
 
 #on appelle la fonction globale
