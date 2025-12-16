@@ -1,4 +1,3 @@
-## Se renseigner sur les classes pour ne pas être perdu
 # Les 3 trucs à faire au niveau de json à modifier pour utiliser les classes:
 
 # Le chargement des données
@@ -15,29 +14,87 @@ from datetime import datetime
 import random
 import json
 
+
+
+class User:
+    #Représente un utilisateur du serveur
+    def __init__(self, user_id: int, name: str):
+        self.id = user_id
+        self.name = name
+
+
+class Channel:
+    #Représente un channel du serveur
+    def __init__(self, channel_id: int, name: str, member_ids: list[int]):
+        self.id = channel_id
+        self.name = name
+        self.members = member_ids
+
+
+class Message:
+    #Représente un message du serveur
+    def __init__(self, message_id: int, reception_date: datetime, sender_id: int,  channel: int, content: str):
+        self.id = message_id   
+        self.date = reception_date
+        self.sender = sender_id
+        self.channel = channel 
+        self.mess = content     
+
+
+
+
 # Définition initiale du serveur avec json
 with open("server.json", "r", encoding="utf-8") as f:
-    server = json.load(f)
+    server1 = json.load(f)
+    server = {"users":[], "channels":[], "messages":[]}
+
+for user1 in server1['users']:
+    server["users"].append(User(user1["id"], user1['name']))
+
+for channel1 in server1['channels']:
+    server["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
+
+for message1 in server1['messages']:
+    server["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
+
+
 
 #fonction de sauvegarde du json
 def save():
+    server2={'users':[], 'channels':[], 'messages':[]}
+
+    for user in server['users']:
+        server2['users'].append({"id": user.id, 
+                                 "name": user.name})
+
+    for channel in server['channels']:
+        server2['channels'].append({"id": channel.id, 
+                                    "name": channel.name, 
+                                    "member_ids": channel.members})
+
+    for message in server['messages']:
+        server2['messages'].append({"id": message.id, 
+                                    "reception_date": message.date, 
+                                    "sender_id": message.sender, 
+                                    "channel": message.channel, 
+                                    "content": message.mess})
     with open("server.json", "w", encoding = "utf-8") as f:
-        json.dump(server, f, ensure_ascii=False, indent=2)
+        json.dump(server2, f, ensure_ascii=False, indent=2)
 
 
 #Fonctions pour l'automatisation du choix des identifiants
 
 def get_userid_available():
-    userid_taken = {user['id'] for user in server['users']}
+    userid_taken = {user.id for user in server['users']}
     return [i for i in range(50) if i not in userid_taken]
 
 
 def get_channelid_available():
-    channelid_taken = {channel['id'] for channel in server['channels']}
+    channelid_taken = {channel.id for channel in server['channels']}
     return [i for i in range(50) if i not in channelid_taken]
 
 def get_messageid_available():
-    messageid_taken = {message['id'] for message in server['messages']}
+    messageid_taken = {message.id for message in server['messages']}
     return [i for i in range(50) if i not in messageid_taken]
 
 ##Fonctions de navigation
@@ -48,19 +105,19 @@ def acceuil():
     print('=== Bienvenue dans la messagerie ===')
     print('liste des utilisateurs:')
     for user in server['users']:
-        print(user['id'], user['name'])
+        print(user.id, user.name)
     print('---------------------------------')
     print('Renseignez votre nom pour vous connecter.')
     print("n: je n'ai pas encore de profil")
-    choice = input("Nom (ou 'n'):")
+    choice:str = input("Nom (ou 'n'):")
     if choice == 'n':
         ajout_utilisateur()
         acceuil()
     else:
         for user in server['users']:
-            if choice == user['name']:
+            if choice == user.name:
                 login = True
-                print(f"Connecté en tant que {user['name']}!")
+                print(f"Connecté en tant que {user.name}!")
                 return(user)
         if not login:
             print("Cet utilisateur n'existe pas, veuillez corriger son nom ou l'ajouter comme nouvel utilisateur")
@@ -91,7 +148,7 @@ def menu_principal():
 def utilisateurs():
     print("===User list===")
     for user in server['users']:
-        print(user['id'], user['name'])
+        print(user.id, user.name)
     print('------------------')
     print("a :  ajouter un utilisateur")
     print("r :  revenir au menu principal")
@@ -111,9 +168,9 @@ def utilisateurs():
 
 def channels():
     print("===Channel list===")
-    for channel in server['channels']:        
-        if userlog['id'] in channel['member_ids']:   #On affiche les channels dans lequel on est seulement
-            print('id:',channel['id'],'| name:', channel['name'])
+    for channel in server["channels"]:        
+        if userlog.id in channel.members:   #On affiche les channels dans lequel on est seulement
+            print('id:',channel.id,'| name:', channel.name)
     print('------------------')
     print("c :  accéder à un channel")
     print("a :  ajouter un channel")
@@ -150,13 +207,13 @@ def channels():
 # Fonction de navigation dans un channel
 
 def in_channel(channelid:int):
-    for mess in server['messages']: 
-            if mess['channel'] == channelid:
-                sender_id = mess['sender_id']
+    for mess in server["messages"]: 
+            if mess.channel == channelid:
+                sender_id = mess.sender
                 for user in server['users']:
-                    if sender_id == user['id']:
-                        sender = user['name']
-                print(mess['reception_date'], sender, ':', mess['content'])
+                    if sender_id == user.id:
+                        sender = user.name
+                print(mess.date, sender, ':', mess.mess)
     print('-----------------------')
     print('e : écrire un message')
     print('r : revenir aux channels')
@@ -181,7 +238,7 @@ def ajout_utilisateur():
     print("ajout d'un utilisateur")
     newid = random.choice(get_userid_available())
     newname = input("new user name?")
-    server['users'].append({'id': newid, 'name': newname})
+    server['users'].append(User(newid, newname))
     save()
 
 
@@ -191,8 +248,8 @@ def ajout_channel():
     newid = random.choice(get_channelid_available())
     newmembers = input("member names (other than you)? Example: user_name1, user_name2, user_name3")
     newmembers = [name.strip() for name in newmembers.split(',')]
-    newmembers.append(userlog['name'])
-    existing_names=[user['name'] for user in server['users']]
+    newmembers.append(userlog.name)
+    existing_names=[user.name for user in server['users']]
     flag=True
     for newmember in newmembers:
         if newmember not in existing_names:
@@ -201,9 +258,9 @@ def ajout_channel():
     if flag:
         new_member_ids=[]
         for user in server['users']:
-            if user['name'] in newmembers:
-                new_member_ids.append(user['id'])
-        server['channels'].append({'id': newid, 'name': newname, 'member_ids': new_member_ids})
+            if user.name in newmembers:
+                new_member_ids.append(user.id)
+        server['channels'].append(Channel(newid, newname, new_member_ids))
         save()
     else:
         choice = input("voulez vous ajouter ce(s) utilisateurs (oui/non)?")
@@ -213,17 +270,14 @@ def ajout_channel():
         elif choice == "non":
             channels()
 
-def ajout_message(channelid):
+def ajout_message(channelid:int):
     newmessage:str = input('nouveau message:')
-    server['messages'].append({"id":random.choice(get_messageid_available()),
-                                "reception_date": str(datetime.now().strftime("%d/%m/%Y %H:%M")),
-                                "sender_id": userlog['id'],
-                                "channel": channelid,
-                                "content": newmessage})
+    newid = random.choice(get_messageid_available())
+    server['messages'].append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage))
     save()
     in_channel(channelid)
 
 
 #on appelle la fonction globale
-userlog = acceuil()
+userlog = acceuil() #attention: userlog est un objet de la classe user
 menu_principal()
