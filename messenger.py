@@ -5,6 +5,8 @@
 from datetime import datetime
 import random
 import json
+import os
+
 
 ## Définition des classes
 
@@ -98,6 +100,7 @@ def get_messageid_available():
 ##Fonctions de navigation
 
 def acceuil():
+    clear_screen()
     login:bool = False
     print('=== Bienvenue dans la messagerie ===')
     print('liste des utilisateurs:')
@@ -122,6 +125,7 @@ def acceuil():
 
     
 def menu_principal():
+    clear_screen()
     print('=== Messenger ===')
     print('u. utilisateurs')
     print('c. channels')
@@ -143,6 +147,7 @@ def menu_principal():
 
 
 def utilisateurs():
+    clear_screen()
     print("===User list===")
     for user in server['users']:
         print(user.id, user.name)
@@ -164,6 +169,7 @@ def utilisateurs():
 
 
 def channels():
+    clear_screen()
     print("===Channel list===")
     for channel in server["channels"]:        
         if userlog.id in channel.members:   #On affiche les channels dans lequel on est seulement
@@ -204,6 +210,7 @@ def channels():
 # Fonction de navigation dans un channel
 
 def in_channel(channelid:int):
+    clear_screen()
     for mess in server["messages"]: 
             if mess.channel == channelid:
                 sender_id = mess.sender
@@ -275,6 +282,12 @@ def ajout_message(channelid:int):
     server['messages'].append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage))
     save()
     in_channel(channelid)
+
+
+## Fonctions d'affichage
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 #on appelle la fonction globale
