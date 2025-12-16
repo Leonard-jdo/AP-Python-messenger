@@ -58,7 +58,7 @@ for message1 in server1['messages']:
 def save():
     server2={'users':[], 'channels':[], 'messages':[]}
 
-# On doit ici formater server2 pour le json
+# On doit ici formater server2 pour le json, c'est à dire comme un dictionnaire de listes de dictionnaires
 
     for user in server['users']:
         server2['users'].append({"id": user.id, 
@@ -83,16 +83,16 @@ def save():
 
 def get_userid_available():
     userid_taken = {user.id for user in server['users']}
-    return [i for i in range(50) if i not in userid_taken]
+    return [i for i in range(100) if i not in userid_taken]
 
 
 def get_channelid_available():
     channelid_taken = {channel.id for channel in server['channels']}
-    return [i for i in range(50) if i not in channelid_taken]
+    return [i for i in range(100) if i not in channelid_taken]
 
 def get_messageid_available():
     messageid_taken = {message.id for message in server['messages']}
-    return [i for i in range(50) if i not in messageid_taken]
+    return [i for i in range(100) if i not in messageid_taken]
 
 
 ##Fonctions de navigation
