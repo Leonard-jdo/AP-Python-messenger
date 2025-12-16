@@ -6,6 +6,11 @@ from datetime import datetime
 import random
 import json
 import os
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+
+console = Console() # L'objet qui remplace print()
 
 
 ## Définition des classes
@@ -147,26 +152,42 @@ def menu_principal():
 
 
 def utilisateurs():
-    clear_screen()
-    print("===User list===")
+    clear_screen()  # Nettoyage de la console
+    
+    # Affichage de la liste des utilisateurs
+    table = Table(title="[bold blue] Liste des Utilisateurs[/bold blue]", style="magenta")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Nom d'utilisateur", style="green")
+
+    # On utilise l'objet 'User' à travers la liste server['users']
     for user in server['users']:
-        print(user.id, user.name)
-    print('------------------')
-    print("a :  ajouter un utilisateur")
-    print("r :  revenir au menu principal")
-    choice2 = input('Select an option: ')
+        table.add_row(str(user.id), user.name)
 
-    if choice2 == 'a':
-        ajout_utilisateur()
+    console.print(table)
+    
+    #Affichage des options (Panneau)
+    console.print(
+        Panel("[bold green]a[/bold green] : Ajouter un utilisateur\n"
+              "[bold red]r[/bold red] : Retour au menu principal\n"
+              "[bold yellow]x[/bold yellow] : Quitter l'application",
+              title="[bold white] Options[/bold white]",
+              border_style="yellow"))
+    
+    choice = console.input('[bold yellow]Votre choix (a/r/q) : [/]')
+
+    if choice == 'a':
+        ajout_utilisateur() 
+        # On rappelle utilisateurs() pour afficher le tableau mis à jour
         utilisateurs()
-
-    if choice2 == 'r':
-        menu_principal()
-
+    elif choice == 'r':
+        menu_principal() 
+    elif choice == 'x':
+        console.print("[bold red]Messagerie fermée.[/bold red]")
+        return
     else:
-        print('Unknown option')
-        utilisateurs()
-
+        # Choix invalide
+        console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
+        utilisateurs() # On rappelle la fonction
 
 def channels():
     clear_screen()
@@ -209,33 +230,86 @@ def channels():
 
 # Fonction de navigation dans un channel
 
-def in_channel(channelid:int):
+
+def in_channel(channelid: int):
     clear_screen()
+    # On va vérifier que le salon existe d'abord
+    current_channel = None # On part du principe qu'on n'a rien trouvé pour l'instant
+    
+    for channel in server['channels']:
+        if channel.id == channelid:
+            current_channel = channel
+            break # On a trouvé, on arrête la boucle inutilement
+            
+    # Si après la boucle, current_channel est toujours None, c'est que l'ID n'existe pas
+    if current_channel is None:
+        console.print("[bold red] Salon non trouvé.[/bold red]")
+        channels()
+        return
+
+    # Créer une table de correspondance ID -> Nom (pour l'affichage des expéditeurs)
+    user_names = {user.id: user.name for user in server['users']}
+
+    # Affichage du titre du Salon
+    console.print(
+        Panel(f"[bold cyan]💬 Bienvenue dans le salon : {current_channel.name}[/bold cyan]",
+              border_style="blue",
+              padding=(1, 2)))
+    
+    console.print("-" * 70, style="dim") # Ligne de séparation
+    
+    # Affichage des messages
+    
+    messages_found = False
     for mess in server["messages"]: 
-            if mess.channel == channelid:
-                sender_id = mess.sender
-                for user in server['users']:
-                    if sender_id == user.id:
-                        sender = user.name
-                print(mess.date, sender, ':', mess.mess)
+        if mess.channel == channelid:
+            messages_found = True
+            
+            sender_name = user_names.get(mess.sender, "Utilisateur Inconnu")
+            
+            # Vérifier si l'expéditeur est l'utilisateur connecté
+            if mess.sender == userlog.id:
+                # Mon message (couleur verte, aligné à droite)
+                message_style = "[bold green]Moi[/bold green]"
+                alignment = "right"
+            else:
+                # Message des autres (couleur jaune, aligné à gauche)
+                message_style = f"[bold yellow]{sender_name}[/bold yellow]"
+                alignment = "left"
 
-    print('-----------------------')
-    
-    print('e : écrire un message')
-    print('r : revenir aux channels')
-    choice4 = input('Select an option: ')
+            # Affichage du message avec la date et le contenu
+            console.print(
+                f"[{mess.date}] {message_style} : {mess.mess}", 
+                justify=alignment
+            )
 
-    if choice4 == 'r':
-        channels()
+    if not messages_found:
+        console.print("[italic dim]Aucun message dans ce salon.[/italic dim]", justify="center")
+
+    console.print("-" * 70, style="dim") # Ligne de séparation
     
-    elif choice4 == 'e':
+    # Menu des options de navigation
+    console.print(
+        Panel("[bold green]e[/bold green] : Écrire un nouveau message\n"
+              "[bold red]r[/bold red] : Retour aux salons\n"
+              "[bold yellow]q[/bold yellow] : Quitter l'application",
+              title="[bold white]➡️ Actions[/bold white]",
+              border_style="yellow"))
+
+    choice = console.input('[bold yellow]Votre choix (e/r/q) : [/]')
+
+    if choice == 'e':
         ajout_message(channelid)
-
+        # On rappelle in_channel pour afficher le nouveau message
+        in_channel(channelid) 
+    elif choice == 'r':
+        channels() 
+    elif choice == 'q':
+        console.print("[bold red]Application fermée.[/bold red]")
+        return
     else:
-        print('Unknown option')
-        channels()
-    
-    channels()
+        console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
+        in_channel(channelid)
 
 
 ## Fonctions d'ajout
