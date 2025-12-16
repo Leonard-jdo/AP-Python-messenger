@@ -128,6 +128,71 @@ def acceuil():
             print("Cet utilisateur n'existe pas, veuillez corriger son nom ou l'ajouter comme nouvel utilisateur")
             acceuil()
 
+def acceuil():
+    clear_screen()
+    
+    # Titre et Bienvenue
+    console.print(
+        Panel.fit(
+            "[bold magenta] Bienvenue sur Python Messenger[/bold magenta]", 
+            subtitle="[italic]Connectez-vous pour discuter[/italic]",
+            padding=(1, 5),
+            border_style="magenta"
+        )
+    )
+    print("")
+    # Affichage des profils existants (Tableau)
+    table = Table(show_header=True, header_style="bold cyan")
+    table.add_column("ID", style="dim", width=4)
+    table.add_column("Nom d'utilisateur", style="bold green")
+
+    # On remplit le tableau avec vos objets User
+    for user in server['users']:
+        table.add_row(str(user.id), user.name)
+
+    console.print(table)
+    print("")
+
+    # Instructions
+    console.print("[yellow]Entrez votre [bold]Nom[/bold] pour vous connecter.[/yellow]")
+    console.print("[dim]Tapez 'n' pour créer un nouveau compte ou 'q' pour quitter.[/dim]")
+    
+    choice = console.input("[bold blue]Votre choix : [/bold blue]")
+
+    # Cas 1 : Créer un nouveau compte
+    if choice == 'n':
+        ajout_utilisateur()
+        return acceuil() # On recharge l'accueil après la création
+
+    # Cas 2 : Quitter
+    elif choice == 'q':
+        console.print("[bold red]Fermeture de l'application[/bold red]")
+        exit() # Arrête tout le programme proprement
+
+    # Cas 3 : Tentative de connexion (Recherche de l'utilisateur)
+    else:
+        found_user = None
+        
+        # On cherche l'utilisateur qui porte ce nom
+        for user in server['users']:
+            if user.name == choice:
+                found_user = user
+                break 
+        
+        # Si on a trouvé quelqu'un
+        if found_user:
+            console.print(f"[bold green] Connexion réussie ! Bonjour {found_user.name}.[/bold green]")
+            # Petite pause pour que l'utilisateur voie le message de succès
+            import time
+            time.sleep(1) 
+            return found_user
+            
+        # Si on n'a trouvé personne
+        else:
+            console.print(Panel("[bold red] Utilisateur inconnu ![/bold red]", border_style="red"))
+            input("Appuyez sur Entrée pour réessayer...")
+            return acceuil() # On recommence
+
     
 def menu_principal():
     clear_screen()
@@ -173,7 +238,7 @@ def utilisateurs():
               title="[bold white] Options[/bold white]",
               border_style="yellow"))
     
-    choice = console.input('[bold yellow]Votre choix (a/r/q) : [/]')
+    choice = console.input('[bold yellow]Votre choix (a/r/x) : [/]')
 
     if choice == 'a':
         ajout_utilisateur() 
@@ -228,8 +293,76 @@ def channels():
         print('Unknown option')
         channels()
 
-# Fonction de navigation dans un channel
 
+def channels():
+    clear_screen()
+    
+    # Création du tableau
+    table = Table(title="[bold blue] Vos Salons de Discussion[/bold blue]", style="magenta")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Nom du Salon", style="green")
+    table.add_column("Membres", justify="center", style="white")
+
+    # Remplissage du tableau
+    # On parcourt tous les salons du serveur
+    nb_salons_trouves = 0
+    
+    for channel in server["channels"]:
+        # FILTRE : On n'affiche le salon que si l'ID de l'utilisateur est dans la liste des membres
+        # Note : userlog.id est l'ID de l'utilisateur connecté
+        if userlog.id in channel.members:   
+            nb_salons_trouves += 1
+            # On affiche l'ID, le Nom et le nombre de membres total dans ce salon
+            table.add_row(
+                str(channel.id), 
+                channel.name, 
+                str(len(channel.members))
+            )
+
+    # Si l'utilisateur n'a aucun salon, on affiche un petit message
+    if nb_salons_trouves == 0:
+        console.print(Panel("[italic yellow]Vous n'êtes membre d'aucun salon pour l'instant.[/italic yellow]"))
+    else:
+        console.print(table)
+    
+    # Menu des actions
+    console.print(
+        Panel(
+            "[bold green]c[/bold green] : Choisir un salon (via ID)\n"
+            "[bold blue]a[/bold blue] : Créer un nouveau salon\n"
+            "[bold yellow]r[/bold yellow] : Retour au menu principal\n"
+            "[bold red]x[/bold red] : Quitter",
+            title="[bold white] Actions[/bold white]",
+            border_style="yellow"
+        )
+    )
+    
+    choice3 = console.input('[bold yellow]Votre choix : [/]')
+    
+    if choice3 == 'x':
+        console.print("[bold red]Bye![/bold red]")
+        return
+
+    elif choice3=='c':
+        channelid = int(input("id du channel désiré:"))
+        if channelid not in get_channelid_available(): 
+            in_channel(channelid)
+        else:
+            print("Ce groupe n'existe pas")
+            channels()
+
+    elif choice3 == 'a':
+        ajout_channel()
+        channels()
+
+    elif choice3 == 'r':
+        menu_principal()
+
+    else:
+        channels()
+
+
+# Fonction de navigation dans un channel
 
 def in_channel(channelid: int):
     clear_screen()
@@ -292,11 +425,11 @@ def in_channel(channelid: int):
     console.print(
         Panel("[bold green]e[/bold green] : Écrire un nouveau message\n"
               "[bold red]r[/bold red] : Retour aux salons\n"
-              "[bold yellow]q[/bold yellow] : Quitter l'application",
-              title="[bold white]➡️ Actions[/bold white]",
+              "[bold yellow]x[/bold yellow] : Quitter l'application",
+              title="[bold white] Actions[/bold white]",
               border_style="yellow"))
 
-    choice = console.input('[bold yellow]Votre choix (e/r/q) : [/]')
+    choice = console.input('[bold yellow]Votre choix (e/r/x) : [/]')
 
     if choice == 'e':
         ajout_message(channelid)
@@ -304,12 +437,13 @@ def in_channel(channelid: int):
         in_channel(channelid) 
     elif choice == 'r':
         channels() 
-    elif choice == 'q':
+    elif choice == 'x':
         console.print("[bold red]Application fermée.[/bold red]")
         return
     else:
         console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
         in_channel(channelid)
+
 
 
 ## Fonctions d'ajout

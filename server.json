@@ -85,6 +85,17 @@
         30,
         40
       ]
+    },
+    {
+      "id": 99,
+      "name": "szytdfz",
+      "member_ids": [
+        41,
+        23,
+        6,
+        30,
+        40
+      ]
     }
   ],
   "messages": [
@@ -129,6 +140,13 @@
       "sender_id": 30,
       "channel": 15,
       "content": "Hey Leo"
+    },
+    {
+      "id": 0,
+      "reception_date": "16/12/2025 16:53",
+      "sender_id": 41,
+      "channel": 12,
+      "content": "Newmess"
     }
   ]
 }
