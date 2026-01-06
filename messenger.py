@@ -52,7 +52,16 @@ class RemoteStorage:
         data = response.json()
         userlist = [User(user['id'], user['name']) for user in data]
         return userlist
+    
+    def create_user():
+        print("ajout d'un utilisateur")
+        newname = input("new user name?")
+        newuser = {"name": newname}
+        
+        # On envoie le dictionnaire au serveur
+        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
 
+RemoteStorage.create_user()
 
 
 ## Définition initiale du serveur avec json
@@ -513,5 +522,5 @@ def clear_screen():
 
 
 # on appelle la fonction globale
-userlog = acceuil() #attention: userlog est un objet de la classe user
-menu_principal()
+#userlog = acceuil() #attention: userlog est un objet de la classe user
+#menu_principal()
