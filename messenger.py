@@ -34,7 +34,7 @@ class Channel:
         self.members = member_ids
     
     def __repr__(self) -> str:
-        return f'Channel(name={self.name})'  # Permet d'afficher avec des print
+        return f'Channel(name={self.name}, members={self.members})'  # Permet d'afficher avec des print
 
 
 class Message:
@@ -60,7 +60,8 @@ class RemoteStorage:
         response = requests.get('https://groupe5-python-mines.fr/channels')
         data = response.json()
         for channel in data:
-            member_ids = requests.get("https://groupe5-python-mines.fr/channels/"+ "{channel['id']}" +"/members").json()
+            member_list = requests.get(f"https://groupe5-python-mines.fr/channels/{channel['id']}/members").json()
+            member_ids=[member['id'] for member in member_list]
             channel_list = [Channel(channel['id'], channel['name'], member_ids)  for channel in data]
         return channel_list
 
@@ -72,17 +73,7 @@ class RemoteStorage:
         # On envoie le dictionnaire au serveur
         response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
 
-    def create_channels():
-        print("ajout d'un channel")
-        newname = input("new channel name?")
-        newchannel = {"name": newname}
-        
-        # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
-
-storage = RemoteStorage
-print(storage.get_channels())
-
+print(RemoteStorage().get_channels())
 
 ## Définition initiale du serveur avec json
 
@@ -101,6 +92,7 @@ for message1 in server1['messages']:
     server["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
 
 server['users'] = RemoteStorage.get_users()
+server['channels'] = RemoteStorage.get_channels()
 
 ## Fonction de sauvegarde du serveur json
 
