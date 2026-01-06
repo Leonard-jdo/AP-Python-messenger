@@ -23,7 +23,7 @@ class User:
         self.name = name
 
     def __repr__(self) -> str:
-        return f'User(name={self.name})'
+        return f'User(name={self.name})'  # Permet d'afficher avec des print
 
 
 class Channel:
@@ -53,8 +53,6 @@ class RemoteStorage:
         userlist = [User(user['id'], user['name']) for user in data]
         return userlist
 
-print(RemoteStorage.get_users())
-
 
 
 ## Définition initiale du serveur avec json
@@ -73,7 +71,7 @@ for channel1 in server1['channels']:
 for message1 in server1['messages']:
     server["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
 
-
+server['users'] = RemoteStorage.get_users()
 
 ## Fonction de sauvegarde du serveur json
 
@@ -515,5 +513,5 @@ def clear_screen():
 
 
 # on appelle la fonction globale
-#userlog = acceuil() #attention: userlog est un objet de la classe user
-#menu_principal()
+userlog = acceuil() #attention: userlog est un objet de la classe user
+menu_principal()
