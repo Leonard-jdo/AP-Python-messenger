@@ -5,6 +5,7 @@
 from datetime import datetime
 import random
 import json
+import requests
 import os
 from rich.console import Console
 from rich.table import Table
@@ -46,7 +47,7 @@ class Message:
 
 with open("server.json", "r", encoding="utf-8") as f:
     server1 = json.load(f)
-    server = {"users":[], "channels":[], "messages":[]}
+    server = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
 
 # On convertit ici le dictionnaire de listes de dictionnaire en un dictionnaire de listes contenant des objet des classes User, Channel et Message
 for user1 in server1['users']:
@@ -63,9 +64,10 @@ for message1 in server1['messages']:
 ## Fonction de sauvegarde du serveur json
 
 def save():
+    # il faut formater à nouveau pour avoir un server adapté au json
     server2={'users':[], 'channels':[], 'messages':[]}
 
-# On doit ici formater server2 pour le json, c'est à dire comme un dictionnaire de listes de dictionnaires
+# On doit ici formater server2 pour le json, c'est à dire un dictionnaire de listes de dictionnaires
 
     for user in server['users']:
         server2['users'].append({"id": user.id, 
@@ -83,7 +85,7 @@ def save():
                                     "channel": message.channel, 
                                     "content": message.mess})
     with open("server.json", "w", encoding = "utf-8") as f:
-        json.dump(server2, f, ensure_ascii=False, indent=2)
+        json.dump(server2, f, ensure_ascii=False, indent=2)  # sauvegarde finale
 
 
 ## Fonctions pour l'automatisation du choix des identifiants

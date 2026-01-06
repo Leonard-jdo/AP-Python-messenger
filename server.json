@@ -27,22 +27,6 @@
     {
       "id": 40,
       "name": "Leo"
-    },
-    {
-      "id": 44,
-      "name": "Leoo"
-    },
-    {
-      "id": 35,
-      "name": "fkmeuzghfezuiom"
-    },
-    {
-      "id": 90,
-      "name": "feilugf"
-    },
-    {
-      "id": 93,
-      "name": "fezilyugfui"
     }
   ],
   "channels": [
@@ -96,6 +80,14 @@
         30,
         40
       ]
+    },
+    {
+      "id": 51,
+      "name": "CharlieBob",
+      "member_ids": [
+        23,
+        34
+      ]
     }
   ],
   "messages": [
@@ -147,6 +139,13 @@
       "sender_id": 41,
       "channel": 12,
       "content": "Newmess"
+    },
+    {
+      "id": 96,
+      "reception_date": "06/01/2026 14:07",
+      "sender_id": 34,
+      "channel": 51,
+      "content": "hey bob"
     }
   ]
 }
