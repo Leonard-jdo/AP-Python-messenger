@@ -22,6 +22,9 @@ class User:
         self.id = user_id
         self.name = name
 
+    def __repr__(self) -> str:
+        return f'User(name={self.name})'
+
 
 class Channel:
     #Représente un channel du serveur
@@ -38,8 +41,19 @@ class Message:
         self.date = reception_date
         self.sender = sender_id
         self.channel = channel 
-        self.mess = content     
+        self.mess = content
 
+class RemoteStorage:
+    def __init__(self):
+        pass
+
+    def get_users()->list[User]:
+        response = requests.get('https://groupe5-python-mines.fr/users')
+        data = response.json()
+        userlist = [User(user['id'], user['name']) for user in data]
+        return userlist
+
+print(RemoteStorage.get_users())
 
 
 
@@ -500,6 +514,6 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-#on appelle la fonction globale
-userlog = acceuil() #attention: userlog est un objet de la classe user
-menu_principal()
+# on appelle la fonction globale
+#userlog = acceuil() #attention: userlog est un objet de la classe user
+#menu_principal()
