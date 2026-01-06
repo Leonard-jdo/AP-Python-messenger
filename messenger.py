@@ -1,5 +1,5 @@
 # à faire :
-# Améliorer l'interface d'affichage 
+# finir d'améliorer l'interface d'affichage 
 
 
 from datetime import datetime
