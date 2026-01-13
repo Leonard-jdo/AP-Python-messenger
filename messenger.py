@@ -336,11 +336,14 @@ def channels():
 
     elif choice3=='c':
         channelid = int(input("id du channel désiré:"))
-        if channelid not in get_channelid_available(): 
-            in_channel(channelid)
-        else:
-            print("Ce groupe n'existe pas")
-            channels()
+        # On va vérifier qu'on est dans ce salon
+        for channel in RemoteStorage.get_channels():
+            if channel.id == channelid:
+                in_channel(channel)
+            
+    # Si on arrive ici c'est que l'ID n'existe pas ou qu'on est pas dans ce channel
+        console.print("[bold red] Salon non trouvé.[/bold red]")
+        channels()
 
     elif choice3 == 'a':
         ajout_channel()
@@ -352,31 +355,15 @@ def channels():
     else:
         channels()
 
-
 # Fonction de navigation dans un channel
 
-def in_channel(channelid: int):
-    clear_screen()
-    # On va vérifier que le salon existe d'abord
-    current_channel = None # On part du principe qu'on n'a rien trouvé pour l'instant
-    
-    for channel in server['channels']:
-        if channel.id == channelid:
-            current_channel = channel
-            break # On a trouvé, on arrête la boucle inutilement
-            
-    # Si après la boucle, current_channel est toujours None, c'est que l'ID n'existe pas
-    if current_channel is None:
-        console.print("[bold red] Salon non trouvé.[/bold red]")
-        channels()
-        return
-
+def in_channel(channel: Channel):
     # Créer une table de correspondance ID -> Nom (pour l'affichage des expéditeurs)
-    user_names = {user.id: user.name for user in server['users']}
+    user_names = {user.id: user.name for user in RemoteStorage.get_users()}
 
     # Affichage du titre du Salon
     console.print(
-        Panel(f"[bold cyan]💬 Bienvenue dans le salon : {current_channel.name}[/bold cyan]",
+        Panel(f"[bold cyan]💬 Bienvenue dans le salon : {channel.name}[/bold cyan]",
               border_style="blue",
               padding=(1, 2)))
     
@@ -385,8 +372,8 @@ def in_channel(channelid: int):
     # Affichage des messages
     
     messages_found = False
-    for mess in server["messages"]: 
-        if mess.channel == channelid:
+    for mess in server["messages"]:    #A modifier une fois les messages ajoutés
+        if mess.channel == channel.id:
             messages_found = True
             
             sender_name = user_names.get(mess.sender, "Utilisateur Inconnu")
@@ -424,11 +411,11 @@ def in_channel(channelid: int):
     choice = console.input('[bold yellow]Votre choix (e/r/x) : [/]')
 
     if choice == 'e':
-        ajout_message(channelid)
+        ajout_message(channel.id)
         # On rappelle in_channel pour afficher le nouveau message
-        in_channel(channelid) 
+        in_channel(channel) 
     elif choice =='a':
-        ajout_user_channel(channelid)
+        ajout_user_channel(channel.id)
     elif choice == 'r':
         channels() 
     elif choice == 'x':
@@ -436,7 +423,7 @@ def in_channel(channelid: int):
         return
     else:
         console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
-        in_channel(channelid)
+        in_channel(channel)
 
 
 
