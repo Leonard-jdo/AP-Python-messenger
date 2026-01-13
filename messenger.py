@@ -254,7 +254,7 @@ def utilisateurs():
     table.add_column("Nom d'utilisateur", style="green")
 
     # On utilise l'objet 'User' à travers la liste server['users']
-    for user in server['users']:
+    for user in RemoteStorage.get_users():
         table.add_row(str(user.id), user.name)
 
     console.print(table)
@@ -277,10 +277,11 @@ def utilisateurs():
         menu_principal() 
     elif choice == 'x':
         console.print("[bold red]Messagerie fermée.[/bold red]")
-        return
+        exit()
     else:
         # Choix invalide
         console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
+        time.sleep(1)
         utilisateurs() # On rappelle la fonction
 
 
