@@ -431,24 +431,27 @@ def in_channel(channel: Channel):
 
 def ajout_utilisateur():
     print("ajout d'un utilisateur")
-    newid = random.choice(get_userid_available())
     newname = input("new user name?")
-    server['users'].append(User(newid, newname))
+    RemoteStorage.create_user(newname)
 
 
 def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
-    RemoteStorage.create_channel(newname)
+    channel_id = RemoteStorage.create_channel(newname)
+
     print('Channel créé avec succès! Qui voulez vous ajouter à ce channel?')
     time.sleep(3)
+
     print("--- Liste des utilisateurs disponibles ---")
     for user in RemoteStorage.get_users():
         print(f"[{user.id}] {user.name}")
     print("------------------------------")
+
     newmembers = input("member ids (other than you)? Example: user_id1, user_id2, user_id3")
     newmembers = [id for id in newmembers.split(',')]
     newmembers.append(userlog.id) #on se rajoute nous même
+
     existing_ids=[user.id for user in RemoteStorage.get_users()]
     for newmember in newmembers:
         flag = True
@@ -457,16 +460,10 @@ def ajout_channel():
             newmembers.pop(newmember)
             flag = False
         if flag:
-            RemoteStorage.add_user_channel(newmember, channel_id)  #A CODER UNE FOIS QUE REMOTESTORAGE.CREATE_CHANNEL RENVOIE UN TRUC ET PAS RIEN
-            server['channels'].append(Channel(newid, newname, newmembers))
+            RemoteStorage.add_user_channel(newmember, channel_id)
+            server['channels'].append(Channel(channel_id, newname, newmembers))
         save()
-    else:
-        choice = input("voulez vous ajouter ce(s) utilisateurs (oui/non)?")
-        if choice == "oui":
-            ajout_utilisateur()
-            utilisateurs()
-        elif choice == "non":
-            channels()
+        channels()
 
 def ajout_message(channelid:int):
     newmessage:str = input('nouveau message:')
