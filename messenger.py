@@ -176,7 +176,7 @@ def acceuil():
     table.add_column("Nom d'utilisateur", style="bold green")
 
     # On remplit le tableau avec vos objets User
-    for user in server['users']:
+    for user in RemoteStorage.get_users():
         table.add_row(str(user.id), user.name)
 
     console.print(table)
@@ -191,7 +191,7 @@ def acceuil():
     # Cas 1 : Créer un nouveau compte
     if choice == 'n':
         ajout_utilisateur()
-        return acceuil() # On recharge l'accueil après la création
+        acceuil() # On recharge l'accueil après la création du nouveau compte
 
     # Cas 2 : Quitter
     elif choice == 'q':
@@ -203,7 +203,7 @@ def acceuil():
         found_user = None
         
         # On cherche l'utilisateur qui porte ce nom
-        for user in server['users']:
+        for user in RemoteStorage.get_users():
             if user.name == choice:
                 found_user = user
                 break 
@@ -212,14 +212,14 @@ def acceuil():
         if found_user:
             console.print(f"[bold green] Connexion réussie ! Bonjour {found_user.name}.[/bold green]")
             # Petite pause pour que l'utilisateur voie le message de succès
-            time.sleep(1) 
+            time.sleep(1.5) 
             return found_user
             
         # Si on n'a trouvé personne
         else:
             console.print(Panel("[bold red] Utilisateur inconnu ![/bold red]", border_style="red"))
             input("Appuyez sur Entrée pour réessayer...")
-            return acceuil() # On recommence
+            acceuil() # On recommence
 
     
 def menu_principal():
@@ -445,7 +445,6 @@ def ajout_utilisateur():
     newid = random.choice(get_userid_available())
     newname = input("new user name?")
     server['users'].append(User(newid, newname))
-    save()
 
 
 def ajout_channel():
