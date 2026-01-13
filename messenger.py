@@ -61,16 +61,14 @@ class RemoteStorage:
         return user_list
 
 
-    def create_user():
-        print("ajout d'un utilisateur")
-        newname = input("new user name?")
-        newuser = {"name": newname}
-        
+    def create_user(newname:str) -> int:
+        newuser = {"name": newname}  
         # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
+        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser).json()
+        return response['id']
 
     
-    def get_channels()->list[User]:
+    def get_channels()->list[Channel]:
         response = requests.get('https://groupe5-python-mines.fr/channels')
         data = response.json()
         for channel in data:
@@ -91,11 +89,7 @@ class RemoteStorage:
     def add_user_channel(user_id:int,channel_id:int):
         user = {'user_id': user_id}
         response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
-        print(response)
         
-
-
-print(RemoteStorage.get_channels())
 
 ## Définition initiale du serveur avec json
 
@@ -527,5 +521,5 @@ def clear_screen():
 
 
 # on appelle la fonction globale
-userlog = acceuil() #attention: userlog est un objet de la classe user
-menu_principal()
+#userlog = acceuil() #attention: userlog est un objet de la classe user
+#menu_principal()
