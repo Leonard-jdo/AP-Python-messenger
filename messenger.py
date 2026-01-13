@@ -1,5 +1,5 @@
 # à faire :
-# Améliorer l'interface d'affichage 
+# finir l'interface d'affichage 
 
 
 from datetime import datetime
@@ -61,8 +61,11 @@ class RemoteStorage:
         data = response.json()
         for channel in data:
             member_list = requests.get(f"https://groupe5-python-mines.fr/channels/{channel['id']}/members").json()
-            member_ids=[member['id'] for member in member_list]
-            channel_list = [Channel(channel['id'], channel['name'], member_ids)  for channel in data]
+            member_ids = []
+            for member in member_list:
+                member_ids.append(member['id'])
+            channel['member_ids'] = member_ids
+        channel_list = [Channel(channel['id'], channel['name'], channel['member_ids'])  for channel in data]
         return channel_list
 
     def create_user():
@@ -73,7 +76,9 @@ class RemoteStorage:
         # On envoie le dictionnaire au serveur
         response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
 
-print(RemoteStorage().get_channels())
+
+channels = RemoteStorage.get_channels()
+print (channels)
 
 ## Définition initiale du serveur avec json
 
