@@ -81,10 +81,11 @@ class RemoteStorage:
         return channel_list
     
 
-    def create_channel(newname:str):
+    def create_channel(newname:str) -> int:
         newchannel = {"name": newname}     
         # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel)
+        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
+        return response['id']
 
     def add_user_channel(user_id:int,channel_id:int):
         user = {'user_id': user_id}
