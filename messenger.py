@@ -55,6 +55,16 @@ class RemoteStorage:
         data = response.json()
         user_list = [User(user['id'], user['name']) for user in data]
         return user_list
+
+
+    def create_user():
+        print("ajout d'un utilisateur")
+        newname = input("new user name?")
+        newuser = {"name": newname}
+        
+        # On envoie le dictionnaire au serveur
+        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
+
     
     def get_channels()->list[User]:
         response = requests.get('https://groupe5-python-mines.fr/channels')
@@ -67,18 +77,21 @@ class RemoteStorage:
             channel['member_ids'] = member_ids
         channel_list = [Channel(channel['id'], channel['name'], channel['member_ids'])  for channel in data]
         return channel_list
+    
 
-    def create_user():
-        print("ajout d'un utilisateur")
-        newname = input("new user name?")
-        newuser = {"name": newname}
-        
+    def create_channel(newname:str):
+        newchannel = {"name": newname}     
         # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser)
+        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel)
+
+    def add_user_channel(user_id:int,channel_id:int):
+        user = {'user_id': user_id}
+        response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
+        print(response)
+        
 
 
-channels = RemoteStorage.get_channels()
-print (channels)
+print(RemoteStorage.get_channels())
 
 ## Définition initiale du serveur avec json
 
@@ -294,6 +307,7 @@ def utilisateurs():
         console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
         utilisateurs() # On rappelle la fonction
 
+'''
 def channels():
     clear_screen()
     print("===Channel list===")
@@ -332,7 +346,7 @@ def channels():
     else:
         print('Unknown option')
         channels()
-
+'''
 
 def channels():
     clear_screen()
@@ -464,6 +478,7 @@ def in_channel(channelid: int):
     # Menu des options de navigation
     console.print(
         Panel("[bold green]e[/bold green] : Écrire un nouveau message\n"
+              "[bold blue]a[/bold blue] : Ajouter un utilisateur à ce channel\n"
               "[bold red]r[/bold red] : Retour aux salons\n"
               "[bold yellow]x[/bold yellow] : Quitter l'application",
               title="[bold white] Actions[/bold white]",
@@ -475,6 +490,8 @@ def in_channel(channelid: int):
         ajout_message(channelid)
         # On rappelle in_channel pour afficher le nouveau message
         in_channel(channelid) 
+    elif choice =='a':
+        ajout_user_channel(channelid)
     elif choice == 'r':
         channels() 
     elif choice == 'x':
@@ -499,6 +516,7 @@ def ajout_utilisateur():
 def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
+    RemoteStorage.create_channel(newname)
     newid = random.choice(get_channelid_available())
     newmembers = input("member names (other than you)? Example: user_name1, user_name2, user_name3")
     newmembers = [name.strip() for name in newmembers.split(',')]
@@ -530,6 +548,32 @@ def ajout_message(channelid:int):
     server['messages'].append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage))
     save()
     in_channel(channelid)
+
+def ajout_user_channel(channel_id):
+    storage = RemoteStorage()
+    users_list = storage.get_users()
+    
+    print("--- Liste des utilisateurs disponibles ---")
+    # On affiche les utilisateurs
+    for user in users_list:
+        print(f"[{user.id}] {user.name}")
+    print("------------------------------")
+    flag = True
+    while flag:
+        choix = input("Entrez l'ID de l'utilisateur à ajouter (ou 'q' pour annuler) : ")
+        
+        if choix == 'q':
+            return None
+        
+        # 4. On vérifie que l'ID existe vraiment dans la liste
+        # On compare des strings pour éviter les erreurs de type (int vs str)
+        for user in users_list:
+            if str(user.id) == choix:
+                print(f"Sélectionné : {user.name}")
+                user_id = user.id # On renvoie l'ID pour la requête API
+                flag = False
+        print("ID introuvable. Veuillez réessayer.")
+    RemoteStorage.add_user_channel(user_id, channel_id)
 
 
 ## Fonctions d'affichage
