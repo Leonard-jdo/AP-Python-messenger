@@ -461,7 +461,6 @@ def ajout_channel():
             flag = False
         if flag:
             RemoteStorage.add_user_channel(newmember, channel_id)
-            server['channels'].append(Channel(channel_id, newname, newmembers))
         save()
         channels()
 
@@ -473,11 +472,10 @@ def ajout_message(channelid:int):
     in_channel(channelid)
 
 def ajout_user_channel(channel_id):
-    users_list = RemoteStorage.get_users()
     
     print("--- Liste des utilisateurs disponibles ---")
     # On affiche les utilisateurs
-    for user in users_list:
+    for user in RemoteStorage.get_users():
         print(f"[{user.id}] {user.name}")
     print("------------------------------")
     flag = True
@@ -489,7 +487,7 @@ def ajout_user_channel(channel_id):
         
         # 4. On vérifie que l'ID existe vraiment dans la liste
         # On compare des strings pour éviter les erreurs de type (int vs str)
-        for user in users_list:
+        for user in RemoteStorage.get_users():
             if str(user.id) == choix:
                 print(f"Sélectionné : {user.name}")
                 user_id = user.id # On renvoie l'ID pour la requête API
