@@ -141,17 +141,17 @@ def save():
 ## Fonctions pour l'automatisation du choix des identifiants
 
 def get_userid_available():
-    userid_taken = {user.id for user in server['users']}
-    return [i for i in range(100) if i not in userid_taken]
+    userid_taken = {user.id for user in RemoteStorage.get_users()}
+    return [i for i in range(1000) if i not in userid_taken]
 
 
 def get_channelid_available():
-    channelid_taken = {channel.id for channel in server['channels']}
-    return [i for i in range(100) if i not in channelid_taken]
+    channelid_taken = {channel.id for channel in RemoteStorage.get_channels()}
+    return [i for i in range(1000) if i not in channelid_taken]
 
 def get_messageid_available():
-    messageid_taken = {message.id for message in server['messages']}
-    return [i for i in range(100) if i not in messageid_taken]
+    messageid_taken = {message.id for message in server['messages']}  #à modifier une fois les fonctions messages implémentées dans remotestorage
+    return [i for i in range(1000) if i not in messageid_taken]
 
 
 ##Fonctions de navigation
@@ -298,7 +298,7 @@ def channels():
     # On parcourt tous les salons du serveur
     nb_salons_trouves = 0
     
-    for channel in server["channels"]:
+    for channel in RemoteStorage.get_channels():
         # FILTRE : On n'affiche le salon que si l'ID de l'utilisateur est dans la liste des membres
         # Note : userlog.id est l'ID de l'utilisateur connecté
         if userlog.id in channel.members:   
@@ -332,7 +332,7 @@ def channels():
     
     if choice3 == 'x':
         console.print("[bold red]Bye![/bold red]")
-        return
+        exit()
 
     elif choice3=='c':
         channelid = int(input("id du channel désiré:"))
