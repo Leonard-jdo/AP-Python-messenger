@@ -1,5 +1,8 @@
 # à faire :
 # finir l'interface d'affichage 
+#pour résoudre le problème de la création de chnnel et de l'ajout de membres dans ce dernier, on va partir du principe qu'on peut pas rejoindre
+#un channel dans lequel on est pas tout seul, il faut que un membre de ce channel nous ajoute (c'est déjà codé ça). 
+#Ducoup il faut que lorsqu'on crée un channel, on entre les members qu'on veut y mettre (ça ça doit être fait en local dans les fonctions de navigation)
 
 
 from datetime import datetime
@@ -10,6 +13,7 @@ import os
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+import time
 
 console = Console() # L'objet qui remplace print()
 
@@ -157,29 +161,6 @@ def get_messageid_available():
 
 ##Fonctions de navigation
 
-def acceuil():
-    clear_screen()
-    login:bool = False
-    print('=== Bienvenue dans la messagerie ===')
-    print('liste des utilisateurs:')
-    for user in server['users']:
-        print(user.id, user.name)
-    print('---------------------------------')
-    print('Renseignez votre nom pour vous connecter.')
-    print("n: je n'ai pas encore de profil")
-    choice:str = input("Nom (ou 'n'):")
-    if choice == 'n':
-        ajout_utilisateur()
-        acceuil()
-    else:
-        for user in server['users']:
-            if choice == user.name:
-                login = True
-                print(f"Connecté en tant que {user.name}!")
-                return(user)
-        if not login:
-            print("Cet utilisateur n'existe pas, veuillez corriger son nom ou l'ajouter comme nouvel utilisateur")
-            acceuil()
 
 def acceuil():
     clear_screen()
@@ -236,7 +217,6 @@ def acceuil():
         if found_user:
             console.print(f"[bold green] Connexion réussie ! Bonjour {found_user.name}.[/bold green]")
             # Petite pause pour que l'utilisateur voie le message de succès
-            import time
             time.sleep(1) 
             return found_user
             
@@ -307,46 +287,6 @@ def utilisateurs():
         console.print("[bold red] Choix invalide. Veuillez réessayer.[/bold red]")
         utilisateurs() # On rappelle la fonction
 
-'''
-def channels():
-    clear_screen()
-    print("===Channel list===")
-    for channel in server["channels"]:        
-        if userlog.id in channel.members:   #On affiche les channels dans lequel on est seulement
-            print('id:',channel.id,'| name:', channel.name)
-    print('------------------')
-    print("c :  accéder à un channel")
-    print("a :  ajouter un channel")
-    print("r :  revenir au menu principal")
-    print('x :  leave')
-    choice3 = input('Select an option: ')
-    
-    if choice3 == 'x':
-        return('Bye!')
-
-    elif choice3=='c':
-        channelid = int(input("id du channel désiré:"))
-        if channelid not in get_channelid_available(): 
-            in_channel(channelid)
-        else:
-            print("Ce groupe n'existe pas")
-            channels()
-        
-        
-    elif choice3 == 'e':
-        ajout_message()
-
-    elif choice3 == 'a':
-        ajout_channel()
-        channels()
-
-    elif choice3=='r':
-        menu_principal()
-
-    else:
-        print('Unknown option')
-        channels()
-'''
 
 def channels():
     clear_screen()
@@ -382,7 +322,7 @@ def channels():
     # Menu des actions
     console.print(
         Panel(
-            "[bold green]c[/bold green] : Choisir un salon (via ID)\n"
+            "[bold green]c[/bold green] : Choisir un salon\n"
             "[bold blue]a[/bold blue] : Créer un nouveau salon\n"
             "[bold yellow]r[/bold yellow] : Retour au menu principal\n"
             "[bold red]x[/bold red] : Quitter",
@@ -517,22 +457,25 @@ def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
     RemoteStorage.create_channel(newname)
-    newid = random.choice(get_channelid_available())
-    newmembers = input("member names (other than you)? Example: user_name1, user_name2, user_name3")
-    newmembers = [name.strip() for name in newmembers.split(',')]
-    newmembers.append(userlog.name) #on se rajoute nous même
-    existing_names=[user.name for user in server['users']]
-    flag=True
+    print('Channel créé avec succès! Qui voulez vous ajouter à ce channel?')
+    time.sleep(3)
+    print("--- Liste des utilisateurs disponibles ---")
+    for user in RemoteStorage.get_users():
+        print(f"[{user.id}] {user.name}")
+    print("------------------------------")
+    newmembers = input("member ids (other than you)? Example: user_id1, user_id2, user_id3")
+    newmembers = [id for id in newmembers.split(',')]
+    newmembers.append(userlog.id) #on se rajoute nous même
+    existing_ids=[user.id for user in RemoteStorage.get_users()]
     for newmember in newmembers:
-        if newmember not in existing_names:
+        flag = True
+        if newmember not in existing_ids:
             print(f'{newmember} is not in the server')
-            flag=False
-    if flag:
-        new_member_ids=[]
-        for user in server['users']:
-            if user.name in newmembers:
-                new_member_ids.append(user.id)
-        server['channels'].append(Channel(newid, newname, new_member_ids))
+            newmembers.pop(newmember)
+            flag = False
+        if flag:
+            RemoteStorage.add_user_channel(newmember, channel_id)  #A CODER UNE FOIS QUE REMOTESTORAGE.CREATE_CHANNEL RENVOIE UN TRUC ET PAS RIEN
+            server['channels'].append(Channel(newid, newname, newmembers))
         save()
     else:
         choice = input("voulez vous ajouter ce(s) utilisateurs (oui/non)?")
@@ -550,8 +493,7 @@ def ajout_message(channelid:int):
     in_channel(channelid)
 
 def ajout_user_channel(channel_id):
-    storage = RemoteStorage()
-    users_list = storage.get_users()
+    users_list = RemoteStorage.get_users()
     
     print("--- Liste des utilisateurs disponibles ---")
     # On affiche les utilisateurs
@@ -563,7 +505,7 @@ def ajout_user_channel(channel_id):
         choix = input("Entrez l'ID de l'utilisateur à ajouter (ou 'q' pour annuler) : ")
         
         if choix == 'q':
-            return None
+            in_channel(channel_id)
         
         # 4. On vérifie que l'ID existe vraiment dans la liste
         # On compare des strings pour éviter les erreurs de type (int vs str)
@@ -572,8 +514,10 @@ def ajout_user_channel(channel_id):
                 print(f"Sélectionné : {user.name}")
                 user_id = user.id # On renvoie l'ID pour la requête API
                 flag = False
-        print("ID introuvable. Veuillez réessayer.")
+            if not flag:
+                print("ID introuvable. Veuillez réessayer.")
     RemoteStorage.add_user_channel(user_id, channel_id)
+    in_channel(channel_id)
 
 
 ## Fonctions d'affichage
@@ -583,5 +527,5 @@ def clear_screen():
 
 
 # on appelle la fonction globale
-#userlog = acceuil() #attention: userlog est un objet de la classe user
-#menu_principal()
+userlog = acceuil() #attention: userlog est un objet de la classe user
+menu_principal()

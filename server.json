@@ -1,92 +1,347 @@
 {
   "users": [
     {
-      "id": 41,
-      "name": "Alice"
+      "id": 1,
+      "name": "14alarro"
     },
     {
-      "id": 23,
-      "name": "Bob"
+      "id": 2,
+      "name": "Gaspard"
     },
     {
-      "id": 34,
-      "name": "Charlie"
+      "id": 3,
+      "name": "Elyes"
+    },
+    {
+      "id": 7,
+      "name": "Nico"
+    },
+    {
+      "id": 8,
+      "name": "Valentin"
+    },
+    {
+      "id": 9,
+      "name": "Léonard"
+    },
+    {
+      "id": 12,
+      "name": "Perrine"
+    },
+    {
+      "id": 13,
+      "name": "Eleonore"
+    },
+    {
+      "id": 14,
+      "name": "Adele"
     },
     {
       "id": 16,
-      "name": "Delta"
+      "name": "Aymar"
     },
     {
-      "id": 6,
-      "name": "Echo"
+      "id": 17,
+      "name": "Romain"
+    },
+    {
+      "id": 19,
+      "name": "Amandine"
+    },
+    {
+      "id": 20,
+      "name": "Slay"
+    },
+    {
+      "id": 21,
+      "name": "Adele et Eleonore"
+    },
+    {
+      "id": 22,
+      "name": "Adele et ele"
+    },
+    {
+      "id": 23,
+      "name": "Adele et ele"
+    },
+    {
+      "id": 24,
+      "name": "QSE"
+    },
+    {
+      "id": 25,
+      "name": "QSE"
+    },
+    {
+      "id": 26,
+      "name": "BFF"
+    },
+    {
+      "id": 27,
+      "name": "Nicobis"
+    },
+    {
+      "id": 28,
+      "name": "Nicobis2"
+    },
+    {
+      "id": 29,
+      "name": "Romain C"
     },
     {
       "id": 30,
-      "name": "Leonard"
+      "name": "Romain D"
+    },
+    {
+      "id": 31,
+      "name": "romain E"
+    },
+    {
+      "id": 32,
+      "name": "Romain F"
+    },
+    {
+      "id": 33,
+      "name": "Romain G"
+    },
+    {
+      "id": 34,
+      "name": "Romain H"
+    },
+    {
+      "id": 35,
+      "name": "Romain J"
+    },
+    {
+      "id": 36,
+      "name": "Romain K"
+    },
+    {
+      "id": 37,
+      "name": "Romain L"
+    },
+    {
+      "id": 38,
+      "name": "Alix"
+    },
+    {
+      "id": 39,
+      "name": "Romain M"
     },
     {
       "id": 40,
-      "name": "Leo"
+      "name": "Romain Tar"
+    },
+    {
+      "id": 41,
+      "name": "Romain TOur"
+    },
+    {
+      "id": 42,
+      "name": "Bérénice"
+    },
+    {
+      "id": 43,
+      "name": "Romain Tourelle"
+    },
+    {
+      "id": 44,
+      "name": "n"
+    },
+    {
+      "id": 45,
+      "name": "Fab"
+    },
+    {
+      "id": 65,
+      "name": "Léonard2"
     }
   ],
   "channels": [
     {
-      "id": 12,
-      "name": "Town square",
+      "id": 1,
+      "name": "Groupe 5 🐍👨‍💻",
       "member_ids": [
-        41,
-        23
-      ]
-    },
-    {
-      "id": 22,
-      "name": "fezkuig",
-      "member_ids": [
-        23
+        1
       ]
     },
     {
       "id": 2,
-      "name": "newchan",
+      "name": "Amis",
+      "member_ids": []
+    },
+    {
+      "id": 4,
+      "name": "Elyes et cie",
+      "member_ids": []
+    },
+    {
+      "id": 6,
+      "name": "groupe de Nico",
       "member_ids": [
-        41,
-        23,
-        16
+        7
       ]
     },
     {
-      "id": 28,
-      "name": "alice_echo",
+      "id": 7,
+      "name": "slay",
       "member_ids": [
-        41,
-        6
+        13
       ]
+    },
+    {
+      "id": 8,
+      "name": "Adele et ele",
+      "member_ids": []
+    },
+    {
+      "id": 9,
+      "name": "Aymar & Gaspard",
+      "member_ids": []
+    },
+    {
+      "id": 10,
+      "name": "Valentin et Léonard",
+      "member_ids": [
+        9,
+        8
+      ]
+    },
+    {
+      "id": 11,
+      "name": "QSE",
+      "member_ids": []
+    },
+    {
+      "id": 12,
+      "name": "test",
+      "member_ids": []
+    },
+    {
+      "id": 13,
+      "name": "Amis de Romain",
+      "member_ids": []
+    },
+    {
+      "id": 14,
+      "name": "famille",
+      "member_ids": []
     },
     {
       "id": 15,
-      "name": "Leonard-Leo",
+      "name": "famille",
+      "member_ids": []
+    },
+    {
+      "id": 16,
+      "name": "1",
+      "member_ids": []
+    },
+    {
+      "id": 17,
+      "name": "Les copains",
+      "member_ids": []
+    },
+    {
+      "id": 18,
+      "name": "oups",
+      "member_ids": []
+    },
+    {
+      "id": 19,
+      "name": "oups",
       "member_ids": [
-        30,
-        40
+        13,
+        14,
+        20
       ]
     },
     {
-      "id": 99,
-      "name": "szytdfz",
+      "id": 20,
+      "name": "Bordeaux",
+      "member_ids": [
+        13,
+        14,
+        20
+      ]
+    },
+    {
+      "id": 21,
+      "name": "grp",
+      "member_ids": []
+    },
+    {
+      "id": 22,
+      "name": "r",
+      "member_ids": []
+    },
+    {
+      "id": 23,
+      "name": "La Piche ",
+      "member_ids": []
+    },
+    {
+      "id": 24,
+      "name": "Bench",
+      "member_ids": []
+    },
+    {
+      "id": 25,
+      "name": "bench",
+      "member_ids": []
+    },
+    {
+      "id": 26,
+      "name": "La piche encore",
+      "member_ids": []
+    },
+    {
+      "id": 27,
+      "name": "",
+      "member_ids": []
+    },
+    {
+      "id": 28,
+      "name": "etage",
+      "member_ids": []
+    },
+    {
+      "id": 29,
+      "name": "La Piche 3",
+      "member_ids": []
+    },
+    {
+      "id": 30,
+      "name": "cours",
       "member_ids": [
         41,
-        23,
-        6,
-        30,
-        40
+        42
       ]
     },
     {
-      "id": 51,
-      "name": "CharlieBob",
+      "id": 31,
+      "name": "Barcelona",
+      "member_ids": []
+    },
+    {
+      "id": 32,
+      "name": "grp2",
       "member_ids": [
-        23,
-        34
+        12,
+        42
+      ]
+    },
+    {
+      "id": 33,
+      "name": "La Piche 4",
+      "member_ids": []
+    },
+    {
+      "id": 34,
+      "name": "grp3",
+      "member_ids": [
+        42,
+        12
       ]
     }
   ],
