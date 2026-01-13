@@ -231,7 +231,8 @@ def menu_principal():
     choice:str = input('Select an option: ')
 
     if choice == 'x':
-        return('Bye!')
+        print("[bold red]Fermeture de l'application[/bold red]")
+        exit() # Arrête tout le programme proprement
 
     elif choice == 'u':
         utilisateurs()
