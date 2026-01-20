@@ -91,10 +91,9 @@ class RemoteStorage:
         user = {'user_id': user_id}
         requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
 
-    def post_message(self, user_id:int, channel_id:int, content:str) -> dict :
+    def post_message(self, user_id:int, channel_id:int, content:str):
         message = {"sender_id": user_id, "content": content}
         response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/messages/post', json = message).json()
-        return response
     
 
 
@@ -160,22 +159,29 @@ class LocalStorage:
         return newid
 
 
-    def get_channels(self):
+    def get_channels(self) -> list[Channel]:
         return self.load()['channels']
 
 
-    def create_channel(self, newname:str) -> int:
-        newchannel = {"name": newname}     
-        # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
-        return response['id']
+    def create_channel(self, newname:str, memberids) -> int:
+        server = self.load()
+        newid = server['channels'][-1].id + 1   
+        server['channels'].append(Channel(newid, newname, memberids))
+        self.save(server)
+        return newid
 
 
     def get_messages(self):
         return self.load()['messages']
+    
+    def post_message(self, user_id:int, channel_id:int, content:str):
+        server=self.load()
+        newid = server['messages'][-1].id + 1
+        server["messages"].append(Message(newid, datetime.now(), user_id, channel_id, content))
         
 
 storage = LocalStorage()
+
 #newid = storage.create_user('Léonard3')
 #print(newid)
 
@@ -191,7 +197,7 @@ def get_channelid_available():
     return [i for i in range(1000) if i not in channelid_taken]
 
 def get_messageid_available():
-    messageid_taken = {message.id for message in server_local['messages']}  #à modifier une fois les fonctions messages implémentées dans remotestorage
+    messageid_taken = {message.id for message in storage.get_messages()}  
     return [i for i in range(1000) if i not in messageid_taken]
 
 
@@ -413,7 +419,7 @@ def in_channel(channel: Channel):
     # Affichage des messages
     
     messages_found = False
-    for mess in server["messages"]:    #A modifier une fois les messages ajoutés
+    for mess in storage.get_messages():
         if mess.channel == channel.id:
             messages_found = True
             
@@ -479,10 +485,9 @@ def ajout_utilisateur():
 def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
-    channel_id = storage.create_channel(newname)
 
     print('Channel créé avec succès! Qui voulez vous ajouter à ce channel?')
-    time.sleep(3)
+    time.sleep(2.5)
 
     print("--- Liste des utilisateurs disponibles ---")
     for user in storage.get_users():
@@ -490,26 +495,21 @@ def ajout_channel():
     print("------------------------------")
 
     newmembers = input("member ids (other than you)? Example: user_id1, user_id2, user_id3")
-    newmembers = [id for id in newmembers.split(',')]
+    newmembers = [int(id) for id in newmembers.split(',')]
     newmembers.append(userlog.id) #on se rajoute nous même
 
     existing_ids=[user.id for user in storage.get_users()]
     for newmember in newmembers:
-        flag = True
         if newmember not in existing_ids:
             print(f'{newmember} is not in the server')
             newmembers.pop(newmember)
-            flag = False
-        if flag:
-            storage.add_user_channel(newmember, channel_id)
-        save()
-        channels()
+    storage.create_channel(newname, newmembers)
+    channels()
 
 def ajout_message(channelid:int):
     newmessage:str = input('nouveau message:')
-    newid = random.choice(get_messageid_available())
-    server['messages'].append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage))
-    save()
+    storage.get_mess.append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage)) #à modifier
+    storage.
     in_channel(channelid)
 
 def ajout_user_channel(channel_id):
