@@ -1,5 +1,11 @@
 # à faire :
-# finir l'interface d'affichage 
+# implémenter les fonctions de message en local et remote
+# vérifier que tout fonctionne
+# Rajouter l'argument fichier dans la classe LocalStorage et l'argument URL dans la classe RemoteStorage
+# lancer le script à partir d'un terminal avec l'option de choix du local ou du remote
+# Rajouter une classe esthétique pour les fonctions de navigation et finir l'interface visuelle
+# coder --help et éventuellement l'option du login en argument
+
 #pour résoudre le problème de la création de chnnel et de l'ajout de membres dans ce dernier, on va partir du principe qu'on peut pas rejoindre
 #un channel dans lequel on est pas tout seul, il faut que un membre de ce channel nous ajoute (c'est déjà codé ça). 
 #Ducoup il faut que lorsqu'on crée un channel, on entre les members qu'on veut y mettre (ça ça doit être fait en local dans les fonctions de navigation)
@@ -14,8 +20,16 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 import time
+import argparse
 
 console = Console() # L'objet qui remplace print()
+
+
+parser = argparse.ArgumentParser(
+                    prog='messenger.py',
+                    description='Client de messagerie',
+                    epilog='ceci est le texte de help')
+
 
 
 ## Définition des classes
@@ -509,7 +523,7 @@ def ajout_channel():
 def ajout_message(channelid:int):
     newmessage:str = input('nouveau message:')
     storage.get_mess.append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage)) #à modifier
-    storage.
+    #à modofier storage.
     in_channel(channelid)
 
 def ajout_user_channel(channel_id):
