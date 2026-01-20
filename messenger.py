@@ -54,21 +54,21 @@ class RemoteStorage:
     def __init__(self):
         pass
 
-    def get_users()->list[User]:
+    def get_users(self)->list[User]:
         response = requests.get('https://groupe5-python-mines.fr/users')
         data = response.json()
         user_list = [User(user['id'], user['name']) for user in data]
         return user_list
 
 
-    def create_user(newname:str) -> int:
+    def create_user(self, newname:str) -> int:
         newuser = {"name": newname}  
         # On envoie le dictionnaire au serveur
         response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser).json()
         return response['id']
 
     
-    def get_channels()->list[Channel]:
+    def get_channels(self)->list[Channel]:
         response = requests.get('https://groupe5-python-mines.fr/channels')
         data = response.json()
         for channel in data:
@@ -81,35 +81,41 @@ class RemoteStorage:
         return channel_list
     
 
-    def create_channel(newname:str) -> int:
+    def create_channel(self, newname:str) -> int:
         newchannel = {"name": newname}     
         # On envoie le dictionnaire au serveur
         response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
         return response['id']
 
-    def add_user_channel(user_id:int,channel_id:int):
+    def add_user_channel(self, user_id:int,channel_id:int):
         user = {'user_id': user_id}
-        response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
-        
+        requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
+
+    def post_message(self, user_id:int, channel_id:int, content:str) -> dict :
+        message = {"sender_id": user_id, "content": content}
+        response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/messages/post', json = message).json()
+        return response
+    
+storage = RemoteStorage()
 
 ## Définition initiale du serveur avec json
 
 with open("server.json", "r", encoding="utf-8") as f:
     server1 = json.load(f)
-    server = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
+    server_local = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
 
 # On convertit ici le dictionnaire de listes de dictionnaire en un dictionnaire de listes contenant des objet des classes User, Channel et Message
 for user1 in server1['users']:
-    server["users"].append(User(user1["id"], user1['name']))
+    server_local["users"].append(User(user1["id"], user1['name']))
 
 for channel1 in server1['channels']:
-    server["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
+    server_local["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
 
 for message1 in server1['messages']:
-    server["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
+    server_local["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
 
-server['users'] = RemoteStorage.get_users()
-server['channels'] = RemoteStorage.get_channels()
+server_local['users'] = storage.get_users()
+server_local['channels'] = storage.get_channels()
 
 ## Fonction de sauvegarde du serveur json
 
@@ -119,16 +125,16 @@ def save():
 
 # On doit ici formater server2 pour le json, c'est à dire un dictionnaire de listes de dictionnaires
 
-    for user in server['users']:
+    for user in server_local['users']:
         server2['users'].append({"id": user.id, 
                                  "name": user.name})
 
-    for channel in server['channels']:
+    for channel in server_local['channels']:
         server2['channels'].append({"id": channel.id, 
                                     "name": channel.name, 
                                     "member_ids": channel.members})
 
-    for message in server['messages']:
+    for message in server_local['messages']:
         server2['messages'].append({"id": message.id, 
                                     "reception_date": message.date, 
                                     "sender_id": message.sender, 
@@ -141,16 +147,16 @@ def save():
 ## Fonctions pour l'automatisation du choix des identifiants
 
 def get_userid_available():
-    userid_taken = {user.id for user in RemoteStorage.get_users()}
+    userid_taken = {user.id for user in storage.get_users()}
     return [i for i in range(1000) if i not in userid_taken]
 
 
 def get_channelid_available():
-    channelid_taken = {channel.id for channel in RemoteStorage.get_channels()}
+    channelid_taken = {channel.id for channel in storage.get_channels()}
     return [i for i in range(1000) if i not in channelid_taken]
 
 def get_messageid_available():
-    messageid_taken = {message.id for message in server['messages']}  #à modifier une fois les fonctions messages implémentées dans remotestorage
+    messageid_taken = {message.id for message in server_local['messages']}  #à modifier une fois les fonctions messages implémentées dans remotestorage
     return [i for i in range(1000) if i not in messageid_taken]
 
 
@@ -176,7 +182,7 @@ def acceuil():
     table.add_column("Nom d'utilisateur", style="bold green")
 
     # On remplit le tableau avec vos objets User
-    for user in RemoteStorage.get_users():
+    for user in storage.get_users():
         table.add_row(str(user.id), user.name)
 
     console.print(table)
@@ -203,7 +209,7 @@ def acceuil():
         found_user = None
         
         # On cherche l'utilisateur qui porte ce nom
-        for user in RemoteStorage.get_users():
+        for user in storage.get_users():
             if user.name == choice:
                 found_user = user
                 break 
@@ -254,7 +260,7 @@ def utilisateurs():
     table.add_column("Nom d'utilisateur", style="green")
 
     # On utilise l'objet 'User' à travers la liste server['users']
-    for user in RemoteStorage.get_users():
+    for user in storage.get_users():
         table.add_row(str(user.id), user.name)
 
     console.print(table)
@@ -298,7 +304,7 @@ def channels():
     # On parcourt tous les salons du serveur
     nb_salons_trouves = 0
     
-    for channel in RemoteStorage.get_channels():
+    for channel in storage.get_channels():
         # FILTRE : On n'affiche le salon que si l'ID de l'utilisateur est dans la liste des membres
         # Note : userlog.id est l'ID de l'utilisateur connecté
         if userlog.id in channel.members:   
@@ -337,7 +343,7 @@ def channels():
     elif choice3=='c':
         channelid = int(input("id du channel désiré:"))
         # On va vérifier qu'on est dans ce salon
-        for channel in RemoteStorage.get_channels():
+        for channel in storage.get_channels():
             if channel.id == channelid:
                 in_channel(channel)
             
@@ -359,7 +365,7 @@ def channels():
 
 def in_channel(channel: Channel):
     # Créer une table de correspondance ID -> Nom (pour l'affichage des expéditeurs)
-    user_names = {user.id: user.name for user in RemoteStorage.get_users()}
+    user_names = {user.id: user.name for user in storage.get_users()}
 
     # Affichage du titre du Salon
     console.print(
@@ -432,19 +438,19 @@ def in_channel(channel: Channel):
 def ajout_utilisateur():
     print("ajout d'un utilisateur")
     newname = input("new user name?")
-    RemoteStorage.create_user(newname)
+    storage.create_user(newname)
 
 
 def ajout_channel():
     print("ajout d'un channel")
     newname = input("new channel name?")
-    channel_id = RemoteStorage.create_channel(newname)
+    channel_id = storage.create_channel(newname)
 
     print('Channel créé avec succès! Qui voulez vous ajouter à ce channel?')
     time.sleep(3)
 
     print("--- Liste des utilisateurs disponibles ---")
-    for user in RemoteStorage.get_users():
+    for user in storage.get_users():
         print(f"[{user.id}] {user.name}")
     print("------------------------------")
 
@@ -452,7 +458,7 @@ def ajout_channel():
     newmembers = [id for id in newmembers.split(',')]
     newmembers.append(userlog.id) #on se rajoute nous même
 
-    existing_ids=[user.id for user in RemoteStorage.get_users()]
+    existing_ids=[user.id for user in storage.get_users()]
     for newmember in newmembers:
         flag = True
         if newmember not in existing_ids:
@@ -460,7 +466,7 @@ def ajout_channel():
             newmembers.pop(newmember)
             flag = False
         if flag:
-            RemoteStorage.add_user_channel(newmember, channel_id)
+            storage.add_user_channel(newmember, channel_id)
         save()
         channels()
 
@@ -475,7 +481,7 @@ def ajout_user_channel(channel_id):
     
     print("--- Liste des utilisateurs disponibles ---")
     # On affiche les utilisateurs
-    for user in RemoteStorage.get_users():
+    for user in storage.get_users():
         print(f"[{user.id}] {user.name}")
     print("------------------------------")
     flag = True
@@ -487,14 +493,14 @@ def ajout_user_channel(channel_id):
         
         # 4. On vérifie que l'ID existe vraiment dans la liste
         # On compare des strings pour éviter les erreurs de type (int vs str)
-        for user in RemoteStorage.get_users():
+        for user in storage.get_users():
             if str(user.id) == choix:
                 print(f"Sélectionné : {user.name}")
                 user_id = user.id # On renvoie l'ID pour la requête API
                 flag = False
             if not flag:
                 print("ID introuvable. Veuillez réessayer.")
-    RemoteStorage.add_user_channel(user_id, channel_id)
+    storage.add_user_channel(user_id, channel_id)
     in_channel(channel_id)
 
 
@@ -505,5 +511,5 @@ def clear_screen():
 
 
 # on appelle la fonction globale
-#userlog = acceuil() #attention: userlog est un objet de la classe user
-#menu_principal()
+userlog = acceuil() #attention: userlog est un objet de la classe user
+menu_principal()
