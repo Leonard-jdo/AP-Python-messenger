@@ -96,53 +96,88 @@ class RemoteStorage:
         response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/messages/post', json = message).json()
         return response
     
-storage = RemoteStorage()
 
-## Définition initiale du serveur avec json
 
-with open("server.json", "r", encoding="utf-8") as f:
-    server1 = json.load(f)
-    server_local = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
+class LocalStorage:
 
-# On convertit ici le dictionnaire de listes de dictionnaire en un dictionnaire de listes contenant des objet des classes User, Channel et Message
-for user1 in server1['users']:
-    server_local["users"].append(User(user1["id"], user1['name']))
+    def init(self):
+        pass
+    
+    def load(self) -> dict:
 
-for channel1 in server1['channels']:
-    server_local["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
+        with open("server.json", "r", encoding="utf-8") as f:
+            server1 = json.load(f)
+        server_local = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
 
-for message1 in server1['messages']:
-    server_local["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
+        # On convertit ici le dictionnaire de listes de dictionnaire en un dictionnaire de listes contenant des objet des classes User, Channel et Message
+        for user1 in server1['users']:
+            server_local["users"].append(User(user1["id"], user1['name']))
 
-server_local['users'] = storage.get_users()
-server_local['channels'] = storage.get_channels()
+        for channel1 in server1['channels']:
+            server_local["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
 
-## Fonction de sauvegarde du serveur json
+        for message1 in server1['messages']:
+            server_local["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
+        
+        return server_local
 
-def save():
-    # il faut formater à nouveau pour avoir un server adapté au json
-    server2={'users':[], 'channels':[], 'messages':[]}
 
-# On doit ici formater server2 pour le json, c'est à dire un dictionnaire de listes de dictionnaires
+    def save(self, newserver):
 
-    for user in server_local['users']:
-        server2['users'].append({"id": user.id, 
-                                 "name": user.name})
+        # il faut formater à nouveau pour avoir un server adapté au json
+        server2={'users':[], 'channels':[], 'messages':[]}
 
-    for channel in server_local['channels']:
-        server2['channels'].append({"id": channel.id, 
-                                    "name": channel.name, 
-                                    "member_ids": channel.members})
+        # On doit ici formater server2 pour le json, c'est à dire un dictionnaire de listes de dictionnaires
 
-    for message in server_local['messages']:
-        server2['messages'].append({"id": message.id, 
-                                    "reception_date": message.date, 
-                                    "sender_id": message.sender, 
-                                    "channel": message.channel, 
-                                    "content": message.mess})
-    with open("server.json", "w", encoding = "utf-8") as f:
-        json.dump(server2, f, ensure_ascii=False, indent=2)  # sauvegarde finale
+        for user in newserver['users']:
+            server2['users'].append({"id": user.id, 
+                                    "name": user.name})
 
+        for channel in newserver['channels']:
+            server2['channels'].append({"id": channel.id, 
+                                        "name": channel.name, 
+                                        "member_ids": channel.members})
+
+        for message in newserver['messages']:
+            server2['messages'].append({"id": message.id, 
+                                        "reception_date": message.date, 
+                                        "sender_id": message.sender, 
+                                        "channel": message.channel, 
+                                        "content": message.mess})
+        with open("server.json", "w", encoding = "utf-8") as f:
+            json.dump(server2, f, ensure_ascii=False, indent=2)  # sauvegarde finale
+
+
+    def get_users(self)->list[User]:
+        return self.load()['users']
+
+
+    def create_user(self, newname:str) -> int:
+        server = self.load()
+        newid = server['users'][-1].id + 1
+        server['users'].append(User(newid, newname))
+        self.save(server)
+        return newid
+
+
+    def get_channels(self):
+        return self.load()['channels']
+
+
+    def create_channel(self, newname:str) -> int:
+        newchannel = {"name": newname}     
+        # On envoie le dictionnaire au serveur
+        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
+        return response['id']
+
+
+    def get_messages(self):
+        return self.load()['messages']
+        
+
+storage = LocalStorage()
+#newid = storage.create_user('Léonard3')
+#print(newid)
 
 ## Fonctions pour l'automatisation du choix des identifiants
 
