@@ -29,5 +29,7 @@ date_objet = datetime.now()
 
 # Conversion en texte (Formatage)
 # On réutilise exactement les mêmes codes
-date_str = date_objet.strftime("%d/%m/%Y %H:%M")
-print(date_str, type(date_str))
+#date_str = date_objet.strftime("%d/%m/%Y %H:%M")
+#print(date_str, type(date_str))
+
+
