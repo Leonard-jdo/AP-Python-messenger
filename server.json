@@ -208,7 +208,9 @@
       "name": "Valentin et Léonard",
       "member_ids": [
         9,
-        8
+        8,
+        65,
+        66
       ]
     },
     {
@@ -347,6 +349,15 @@
         42,
         12
       ]
+    },
+    {
+      "id": 35,
+      "name": "Straal local",
+      "member_ids": [
+        8,
+        3,
+        9
+      ]
     }
   ],
   "messages": [
@@ -405,6 +416,27 @@
       "sender_id": 9,
       "channel": 10,
       "content": "Bonjour Valentin"
+    },
+    {
+      "id": 98,
+      "reception_date": "21/01/2026 12:05",
+      "sender_id": 9,
+      "channel": 35,
+      "content": "Bonjour le straal"
+    },
+    {
+      "id": 99,
+      "reception_date": "21/01/2026 12:19",
+      "sender_id": 9,
+      "channel": 10,
+      "content": "Rebonjour valentin"
+    },
+    {
+      "id": 100,
+      "reception_date": "21/01/2026 12:23",
+      "sender_id": 8,
+      "channel": 10,
+      "content": "Bonjour Léonard"
     }
   ]
 }

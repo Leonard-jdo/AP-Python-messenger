@@ -1,5 +1,5 @@
 # à faire :
-# implémenter les fonctions de message en local et remote
+# implémenter les fonctions de message en remote
 # vérifier que tout fonctionne
 # Rajouter l'argument fichier dans la classe LocalStorage et l'argument URL dans la classe RemoteStorage
 # lancer le script à partir d'un terminal avec l'option de choix du local ou du remote
@@ -103,9 +103,9 @@ class RemoteStorage:
         response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
         return response['id']
 
-    def add_user_channel(self, user_id:int,channel_id:int):
+    def add_user_channel(self, user_id:int,channel:Channel):
         user = {'user_id': user_id}
-        requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/join', json = user)
+        requests.post(f'https://groupe5-python-mines.fr/channels/{channel.id}/join', json = user)
 
     def post_message(self, user_id:int, channel_id:int, content:str):
         message = {"sender_id": user_id, "content": content}
@@ -195,10 +195,18 @@ class LocalStorage:
         newid = server['messages'][-1].id + 1
         server["messages"].append(Message(newid, datetime.now(), user_id, channel_id, content))
         self.save(server)
+    
+    def add_user_channel(self, user_id:int, channel:Channel):
+        server = self.load()
+        for chan in server['channels']:
+            if chan.id == channel.id:
+                if user_id not in chan.members:   # on ajoute pas un utilisateur déjà présent
+                    chan.members.append(user_id)
+                break  # on s'arête si on a ajouté qqlun ou si cette personne y était déjà
+        self.save(server)
         
-
+        
 storage = LocalStorage()
-
 
 ##Fonctions de navigation
 
@@ -521,24 +529,24 @@ def ajout_user_channel(channel:Channel):
     for user in storage.get_users():
         print(f"[{user.id}] {user.name}")
     print("------------------------------")
-    flag = True
-    while flag:
-        choix = input("Entrez l'ID de l'utilisateur à ajouter (ou 'q' pour annuler) : ")
-        
-        if choix == 'q':
-            in_channel(channel.id)
-        
-        # 4. On vérifie que l'ID existe vraiment dans la liste
-        # On compare des strings pour éviter les erreurs de type (int vs str)
-        for user in storage.get_users():
-            if str(user.id) == choix:
-                print(f"Sélectionné : {user.name}")
-                user_id = user.id # On renvoie l'ID pour la requête API
-                flag = False
-            if not flag:
-                print("ID introuvable. Veuillez réessayer.")
-    storage.add_user_channel(user_id, channel.id)
-    in_channel(channel)
+
+
+    choix = input("Entrez le nom de l'utilisateur à ajouter (ou 'q' pour annuler) : ")
+    
+    if choix == 'q':
+        in_channel(channel)
+    
+    # On vérifie que cet utilisateur existe vraiment dans la liste
+    for user in storage.get_users():
+        if user.name == choix:
+            print(f"Sélectionné : {user.name}")
+            time.sleep(1)
+            storage.add_user_channel(user.id, channel) # On renvoie l'ID pour la fonction dans les classe storage
+            in_channel(channel)
+
+    print("utilisateur introuvable. Veuillez réessayer.")
+    time.sleep(1.5)
+    ajout_user_channel(channel)
 
 
 ## Fonctions d'affichage
