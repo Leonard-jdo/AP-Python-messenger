@@ -1,8 +1,6 @@
 # à faire :
 # implémenter les fonctions de message en remote
 # vérifier que tout fonctionne
-# Rajouter l'argument fichier dans la classe LocalStorage et l'argument URL dans la classe RemoteStorage
-# lancer le script à partir d'un terminal avec l'option de choix du local ou du remote
 # Rajouter une classe userinterface pour les fonctions de navigation et finir l'interface visuelle
 # coder --help et éventuellement l'option du login en argument
 
@@ -69,7 +67,7 @@ class RemoteStorage:
         self.url = URL
 
     def get_users(self)->list[User]:
-        response = requests.get(self.url)
+        response = requests.get(f'{self.url}/users')
         data = response.json()
         user_list = [User(user['id'], user['name']) for user in data]
         return user_list
@@ -104,6 +102,13 @@ class RemoteStorage:
     def add_user_channel(self, user_id:int,channel:Channel):
         user = {'user_id': user_id}
         requests.post(f'{self.url}/channels/{channel.id}/join', json = user)
+
+    def get_messages(self):
+        response = requests.get(f'{self.url}/messages')
+        data = response.json()
+        message_list = [Message(message['id'], message['reception_date'], message['sender_id'], message['channel_id'], message['content']) for message in data]
+        return message_list
+
 
     def post_message(self, user_id:int, channel_id:int, content:str):
         message = {"sender_id": user_id, "content": content}
