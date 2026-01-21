@@ -64,6 +64,9 @@ class Message:
         self.channel = channel 
         self.mess = content
 
+    def __repr__(self) -> str:
+        return f'Message({self.mess})'  # Permet d'afficher avec des print
+
 class RemoteStorage:
     def __init__(self):
         pass
@@ -135,7 +138,7 @@ class LocalStorage:
         return server_local
 
 
-    def save(self, newserver):
+    def save(self, newserver:dict):
 
         # il faut formater à nouveau pour avoir un server adapté au json
         server2={'users':[], 'channels':[], 'messages':[]}
@@ -177,7 +180,7 @@ class LocalStorage:
         return self.load()['channels']
 
 
-    def create_channel(self, newname:str, memberids) -> int:
+    def create_channel(self, newname:str, memberids: list[int]) -> int:
         server = self.load()
         newid = server['channels'][-1].id + 1   
         server['channels'].append(Channel(newid, newname, memberids))
@@ -192,27 +195,10 @@ class LocalStorage:
         server=self.load()
         newid = server['messages'][-1].id + 1
         server["messages"].append(Message(newid, datetime.now(), user_id, channel_id, content))
+        self.save(server)
         
 
 storage = LocalStorage()
-
-#newid = storage.create_user('Léonard3')
-#print(newid)
-
-## Fonctions pour l'automatisation du choix des identifiants
-
-def get_userid_available():
-    userid_taken = {user.id for user in storage.get_users()}
-    return [i for i in range(1000) if i not in userid_taken]
-
-
-def get_channelid_available():
-    channelid_taken = {channel.id for channel in storage.get_channels()}
-    return [i for i in range(1000) if i not in channelid_taken]
-
-def get_messageid_available():
-    messageid_taken = {message.id for message in storage.get_messages()}  
-    return [i for i in range(1000) if i not in messageid_taken]
 
 
 ##Fonctions de navigation
@@ -401,6 +387,7 @@ def channels():
         for channel in storage.get_channels():
             if channel.id == channelid:
                 in_channel(channel)
+                break
             
     # Si on arrive ici c'est que l'ID n'existe pas ou qu'on est pas dans ce channel
         console.print("[bold red] Salon non trouvé.[/bold red]")
@@ -419,6 +406,7 @@ def channels():
 # Fonction de navigation dans un channel
 
 def in_channel(channel: Channel):
+    clear_screen()
     # Créer une table de correspondance ID -> Nom (pour l'affichage des expéditeurs)
     user_names = {user.id: user.name for user in storage.get_users()}
 
@@ -472,11 +460,11 @@ def in_channel(channel: Channel):
     choice = console.input('[bold yellow]Votre choix (e/r/x) : [/]')
 
     if choice == 'e':
-        ajout_message(channel.id)
+        ajout_message(channel)
         # On rappelle in_channel pour afficher le nouveau message
         in_channel(channel) 
     elif choice =='a':
-        ajout_user_channel(channel.id)
+        ajout_user_channel(channel)
     elif choice == 'r':
         channels() 
     elif choice == 'x':
@@ -520,13 +508,14 @@ def ajout_channel():
     storage.create_channel(newname, newmembers)
     channels()
 
-def ajout_message(channelid:int):
+def ajout_message(channel:Channel):
+    print('rentrez q pour annuler')
     newmessage:str = input('nouveau message:')
-    storage.get_mess.append(Message(newid, str(datetime.now().strftime("%d/%m/%Y %H:%M")), userlog.id, channelid, newmessage)) #à modifier
-    #à modofier storage.
-    in_channel(channelid)
+    if newmessage != 'q':
+        storage.post_message(userlog.id, channel.id, newmessage)
+    in_channel(channel)
 
-def ajout_user_channel(channel_id):
+def ajout_user_channel(channel:Channel):
     
     print("--- Liste des utilisateurs disponibles ---")
     # On affiche les utilisateurs
@@ -538,7 +527,7 @@ def ajout_user_channel(channel_id):
         choix = input("Entrez l'ID de l'utilisateur à ajouter (ou 'q' pour annuler) : ")
         
         if choix == 'q':
-            in_channel(channel_id)
+            in_channel(channel.id)
         
         # 4. On vérifie que l'ID existe vraiment dans la liste
         # On compare des strings pour éviter les erreurs de type (int vs str)
@@ -549,8 +538,8 @@ def ajout_user_channel(channel_id):
                 flag = False
             if not flag:
                 print("ID introuvable. Veuillez réessayer.")
-    storage.add_user_channel(user_id, channel_id)
-    in_channel(channel_id)
+    storage.add_user_channel(user_id, channel.id)
+    in_channel(channel)
 
 
 ## Fonctions d'affichage
