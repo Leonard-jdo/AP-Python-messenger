@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import random
+import json
 
 server = {
     'users': [
@@ -21,7 +22,12 @@ server = {
         }
     ]
 }
+with open("server.json", "r", encoding="utf-8") as f:
+            server1 = json.load(f)
 
-newmembers = input("member names - (Example: user_name1, user_name2, user_name3) ?")
-newmembers = [name.strip() for name in newmembers.split(',')]
-print(newmembers)
+date_objet = datetime.now() 
+
+# Conversion en texte (Formatage)
+# On réutilise exactement les mêmes codes
+date_str = date_objet.strftime("%d/%m/%Y %H:%M")
+print(date_str, type(date_str))
