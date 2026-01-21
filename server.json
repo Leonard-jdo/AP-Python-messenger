@@ -437,6 +437,13 @@
       "sender_id": 8,
       "channel": 10,
       "content": "Bonjour Léonard"
+    },
+    {
+      "id": 101,
+      "reception_date": "21/01/2026 14:51",
+      "sender_id": 9,
+      "channel": 10,
+      "content": "fekù!zuogfzeliugfez"
     }
   ]
 }

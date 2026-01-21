@@ -3,7 +3,7 @@
 # vérifier que tout fonctionne
 # Rajouter l'argument fichier dans la classe LocalStorage et l'argument URL dans la classe RemoteStorage
 # lancer le script à partir d'un terminal avec l'option de choix du local ou du remote
-# Rajouter une classe esthétique pour les fonctions de navigation et finir l'interface visuelle
+# Rajouter une classe userinterface pour les fonctions de navigation et finir l'interface visuelle
 # coder --help et éventuellement l'option du login en argument
 
 #pour résoudre le problème de la création de chnnel et de l'ajout de membres dans ce dernier, on va partir du principe qu'on peut pas rejoindre
@@ -24,10 +24,8 @@ import argparse
 console = Console() # L'objet qui remplace print()
 
 
-parser = argparse.ArgumentParser(
-                    prog='messenger.py',
-                    description='Client de messagerie',
-                    epilog='ceci est le texte de help')
+
+
 
 
 
@@ -67,11 +65,11 @@ class Message:
         return f'Message({self.mess})'  # Permet d'afficher avec des print
 
 class RemoteStorage:
-    def __init__(self):
-        pass
+    def __init__(self, URL:str):
+        self.url = URL
 
     def get_users(self)->list[User]:
-        response = requests.get('https://groupe5-python-mines.fr/users')
+        response = requests.get(self.url)
         data = response.json()
         user_list = [User(user['id'], user['name']) for user in data]
         return user_list
@@ -80,15 +78,15 @@ class RemoteStorage:
     def create_user(self, newname:str) -> int:
         newuser = {"name": newname}  
         # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/users/create', json=newuser).json()
+        response = requests.post(f'{self.url}/users/create', json=newuser).json()
         return response['id']
 
     
     def get_channels(self)->list[Channel]:
-        response = requests.get('https://groupe5-python-mines.fr/channels')
+        response = requests.get(f'{self.url}/channels')
         data = response.json()
         for channel in data:
-            member_list = requests.get(f"https://groupe5-python-mines.fr/channels/{channel['id']}/members").json()
+            member_list = requests.get(f"{self.url}/channels/{channel['id']}/members").json()
             member_ids = []
             for member in member_list:
                 member_ids.append(member['id'])
@@ -100,27 +98,27 @@ class RemoteStorage:
     def create_channel(self, newname:str) -> int:
         newchannel = {"name": newname}     
         # On envoie le dictionnaire au serveur
-        response = requests.post('https://groupe5-python-mines.fr/channels/create', json=newchannel).json()
+        response = requests.post(f'{self.url}/channels/create', json=newchannel).json()
         return response['id']
 
     def add_user_channel(self, user_id:int,channel:Channel):
         user = {'user_id': user_id}
-        requests.post(f'https://groupe5-python-mines.fr/channels/{channel.id}/join', json = user)
+        requests.post(f'{self.url}/channels/{channel.id}/join', json = user)
 
     def post_message(self, user_id:int, channel_id:int, content:str):
         message = {"sender_id": user_id, "content": content}
-        response = requests.post(f'https://groupe5-python-mines.fr/channels/{channel_id}/messages/post', json = message).json()
+        response = requests.post(f'{self.url}/channels/{channel_id}/messages/post', json = message).json()
     
 
 
 class LocalStorage:
 
-    def init(self):
-        pass
+    def __init__(self, filename:str):
+        self.filename = filename
     
     def load(self) -> dict:
 
-        with open("server.json", "r", encoding="utf-8") as f:
+        with open(self.filename, "r", encoding="utf-8") as f:
             server1 = json.load(f)
         server_local = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
 
@@ -205,8 +203,7 @@ class LocalStorage:
                 break  # on s'arête si on a ajouté qqlun ou si cette personne y était déjà
         self.save(server)
         
-        
-storage = LocalStorage()
+
 
 ##Fonctions de navigation
 
@@ -553,6 +550,33 @@ def ajout_user_channel(channel:Channel):
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
+
+
+#Lancement et parsing initial
+
+parser = argparse.ArgumentParser(description='Client de messagerie')
+    
+# On définit les deux arguments
+parser.add_argument("--local", "-l", help="Nom du fichier JSON pour le mode local")
+parser.add_argument("--remote", "-r", help="URL du serveur pour le mode distant")
+
+args = parser.parse_args()
+
+if args.local:
+    console.print(f"Démarrage en mode LOCAL sur {args.local}")
+    time.sleep(1)
+    storage = LocalStorage(args.local)
+
+elif args.remote:
+    console.print(f"Démarrage en mode REMOTE sur {args.remote}")
+    time.sleep(1)
+    storage = RemoteStorage(args.remote)
+
+else:
+    console.print("Aucun mode spécifié.")
+    console.print("Usage: python messenger.py --local filepath.json")
+    console.print("   ou: python messenger.py --remote server_url")
+
 
 
 # on appelle la fonction globale
