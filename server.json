@@ -347,14 +347,6 @@
         42,
         12
       ]
-    },
-    {
-      "id": 35,
-      "name": "valéo",
-      "member_ids": [
-        8,
-        9
-      ]
     }
   ],
   "messages": [
@@ -413,4 +405,6 @@
       "sender_id": 34,
       "channel": 51,
       "content": "hey bob"
-    }]
+    }
+  ]
+}
