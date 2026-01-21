@@ -12,7 +12,6 @@
 
 
 from datetime import datetime
-import random
 import json
 import requests
 import os
@@ -133,7 +132,7 @@ class LocalStorage:
             server_local["channels"].append(Channel(channel1["id"], channel1['name'], channel1["member_ids"]))
 
         for message1 in server1['messages']:
-            server_local["messages"].append(Message(message1["id"], message1["reception_date"], message1["sender_id"], message1["channel"], message1["content"]))
+            server_local["messages"].append(Message(message1["id"], datetime.strptime(message1["reception_date"], "%d/%m/%Y %H:%M"), message1["sender_id"], message1["channel"], message1["content"]))
         
         return server_local
 
@@ -156,7 +155,7 @@ class LocalStorage:
 
         for message in newserver['messages']:
             server2['messages'].append({"id": message.id, 
-                                        "reception_date": message.date, 
+                                        "reception_date": message.date.strftime("%d/%m/%Y %H:%M"),
                                         "sender_id": message.sender, 
                                         "channel": message.channel, 
                                         "content": message.mess})

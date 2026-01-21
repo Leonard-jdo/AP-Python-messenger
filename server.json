@@ -351,13 +351,6 @@
   ],
   "messages": [
     {
-      "id": 18,
-      "reception_date": "04,11,2025",
-      "sender_id": 41,
-      "channel": 12,
-      "content": "Hi 👋"
-    },
-    {
       "id": 32,
       "reception_date": "09/12/2025 16:55",
       "sender_id": 41,
@@ -405,6 +398,13 @@
       "sender_id": 34,
       "channel": 51,
       "content": "hey bob"
+    },
+    {
+      "id": 97,
+      "reception_date": "21/01/2026 11:40",
+      "sender_id": 9,
+      "channel": 10,
+      "content": "Bonjour Valentin"
     }
   ]
 }
