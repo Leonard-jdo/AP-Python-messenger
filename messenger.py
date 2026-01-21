@@ -1,7 +1,3 @@
-# à faire :
-
-
-
 from datetime import datetime
 import json
 import requests
@@ -16,11 +12,7 @@ console = Console() # L'objet qui remplace print()
 
 
 
-
-
-
-
-## Définition des classes
+## Définition des classes d'objet
 
 class User:
     #Représente un utilisateur du serveur
@@ -42,7 +34,6 @@ class Channel:
     def __repr__(self) -> str:
         return f'Channel(name={self.name}, members={self.members})'  # Permet d'afficher avec des print
 
-
 class Message:
     #Représente un message du serveur
     def __init__(self, message_id: int, reception_date: datetime, sender_id: int,  channel: int, content: str):
@@ -54,6 +45,9 @@ class Message:
 
     def __repr__(self) -> str:
         return f'Message({self.mess})'  # Permet d'afficher avec des print
+
+
+## Définition des classes storage
 
 class RemoteStorage:
     def __init__(self, URL:str):
@@ -107,8 +101,6 @@ class RemoteStorage:
         message = {"sender_id": user_id, "content": content}
         response = requests.post(f'{self.url}/channels/{channel_id}/messages/post', json = message).json()
     
-
-
 class LocalStorage:
 
     def __init__(self, filename:str):
@@ -202,9 +194,7 @@ class LocalStorage:
         self.save(server)
         
 
-
 ##Fonctions de navigation
-
 
 def acceuil():
     clear_screen()
@@ -405,7 +395,6 @@ def channels():
     else:
         channels()
 
-# Fonction de navigation dans un channel
 
 def in_channel(channel: Channel):
     clear_screen()
@@ -477,7 +466,6 @@ def in_channel(channel: Channel):
         in_channel(channel)
 
 
-
 ## Fonctions d'ajout
 
 def ajout_utilisateur():
@@ -510,12 +498,14 @@ def ajout_channel():
     storage.create_channel(newname, newmembers)
     channels()
 
+
 def ajout_message(channel:Channel):
     print('rentrez q pour annuler')
     newmessage:str = input('nouveau message:')
     if newmessage != 'q':
         storage.post_message(userlog.id, channel.id, newmessage)
     in_channel(channel)
+
 
 def ajout_user_channel(channel:Channel):
     
@@ -550,7 +540,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-#Lancement et parsing initial
+# Lancement et parsing initial
 
 parser = argparse.ArgumentParser(description='Client de messagerie')
     
@@ -578,5 +568,6 @@ else:
 
 
 # on appelle la fonction globale
-userlog = acceuil() #attention: userlog est un objet de la classe user
+
+userlog = acceuil() # Userlog est un objet de la classe user
 menu_principal()
