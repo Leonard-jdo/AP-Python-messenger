@@ -569,8 +569,7 @@ if __name__ == 'name':
         console.print("   ou: python messenger.py --remote server_url")
 
 
-
-# on appelle la fonction globale
+    # on appelle la fonction globale
 
     userlog = acceuil() # Userlog est un objet de la classe user
     menu_principal()
