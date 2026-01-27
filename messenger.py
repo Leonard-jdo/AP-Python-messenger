@@ -23,7 +23,6 @@ class User:
     def __repr__(self) -> str:
         return f'User(name={self.name})'  # Permet d'afficher avec des print
 
-
 class Channel:
     #Représente un channel du serveur
     def __init__(self, channel_id: int, name: str, member_ids: list[int]):
@@ -180,7 +179,10 @@ class LocalStorage:
     
     def post_message(self, user_id:int, channel_id:int, content:str):
         server=self.load()
-        newid = server['messages'][-1].id + 1
+        if len(server['messages']) == 0:
+            newid = 1
+        else:
+            newid = server['messages'][-1].id + 1
         server["messages"].append(Message(newid, datetime.now(), user_id, channel_id, content))
         self.save(server)
     
@@ -541,33 +543,34 @@ def clear_screen():
 
 
 # Lancement et parsing initial
+if __name__ == 'name':
+    print('On poursuit la lecture')
+    parser = argparse.ArgumentParser(description='Client de messagerie')
+        
+    # On définit les deux arguments
+    parser.add_argument("--local", "-l", help="Nom du fichier JSON pour le mode local")
+    parser.add_argument("--remote", "-r", help="URL du serveur pour le mode distant")
 
-parser = argparse.ArgumentParser(description='Client de messagerie')
-    
-# On définit les deux arguments
-parser.add_argument("--local", "-l", help="Nom du fichier JSON pour le mode local")
-parser.add_argument("--remote", "-r", help="URL du serveur pour le mode distant")
+    args = parser.parse_args()
 
-args = parser.parse_args()
+    if args.local:
+        console.print(f"Démarrage en mode LOCAL sur {args.local}")
+        time.sleep(1)
+        storage = LocalStorage(args.local)
 
-if args.local:
-    console.print(f"Démarrage en mode LOCAL sur {args.local}")
-    time.sleep(1)
-    storage = LocalStorage(args.local)
+    elif args.remote:
+        console.print(f"Démarrage en mode REMOTE sur {args.remote}")
+        time.sleep(1)
+        storage = RemoteStorage(args.remote)
 
-elif args.remote:
-    console.print(f"Démarrage en mode REMOTE sur {args.remote}")
-    time.sleep(1)
-    storage = RemoteStorage(args.remote)
-
-else:
-    console.print("Aucun mode spécifié.")
-    console.print("Usage: python messenger.py --local filepath.json")
-    console.print("   ou: python messenger.py --remote server_url")
+    else:
+        console.print("Aucun mode spécifié.")
+        console.print("Usage: python messenger.py --local filepath.json")
+        console.print("   ou: python messenger.py --remote server_url")
 
 
 
 # on appelle la fonction globale
 
-userlog = acceuil() # Userlog est un objet de la classe user
-menu_principal()
+    userlog = acceuil() # Userlog est un objet de la classe user
+    menu_principal()
