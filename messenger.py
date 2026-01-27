@@ -543,7 +543,7 @@ def clear_screen():
 
 
 # Lancement et parsing initial
-if __name__ == 'name':
+if __name__ == "__main__":
     print('On poursuit la lecture')
     parser = argparse.ArgumentParser(description='Client de messagerie')
         
@@ -567,6 +567,7 @@ if __name__ == 'name':
         console.print("Aucun mode spécifié.")
         console.print("Usage: python messenger.py --local filepath.json")
         console.print("   ou: python messenger.py --remote server_url")
+        exit()
 
 
     # on appelle la fonction globale

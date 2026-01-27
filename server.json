@@ -1,4 +1,5 @@
- {"users": [
+{
+  "users": [
     {
       "id": 1,
       "name": "14alarro"
@@ -163,7 +164,6 @@
   "channels": [
     {
       "id": 1,
-      "name": "Groupe 5 🐍👨‍💻",
       "name": "Groupe Test",
       "member_ids": [
         1
@@ -437,6 +437,13 @@
       "sender_id": 8,
       "channel": 10,
       "content": "Bonjour Léonard"
+    },
+    {
+      "id": 101,
+      "reception_date": "27/01/2026 16:44",
+      "sender_id": 9,
+      "channel": 35,
+      "content": "vive le straal"
     }
   ]
 }
