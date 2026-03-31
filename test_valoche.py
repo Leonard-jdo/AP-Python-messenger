@@ -15,6 +15,9 @@ class TestLocalStorage:
 
     def test_post_message(self):
         test = {"users": [{"id" : 1, "name" : "test"}],"channels" :[{"id": 1,"name": "Groupe Test","member_ids": [1]}], "messages" : []}
+        # TB d'avoir créé un fichier dédié pour le test.
+        # Mais il n'est pas si fictif que ça si vous ne le supprimez pas
+        # à la fin du test :)
         fichier_fictif = "fichier_test.json"
         with open(fichier_fictif, "w", encoding = "utf-8") as f:
             f.write(json.dumps(test))

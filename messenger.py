@@ -54,6 +54,9 @@ class RemoteStorage:
 
     def get_users(self)->list[User]:
         response = requests.get(f'{self.url}/users')
+        # N'oubliez pas de vérifier les codes de retour HTTP,
+        # soit avec response.raise_for_status(),
+        # soit en vérifiant response.status_code
         data = response.json()
         user_list = [User(user['id'], user['name']) for user in data]
         return user_list
@@ -112,6 +115,10 @@ class LocalStorage:
         server_local = {"users":[], "channels":[], "messages":[]} # Serveur utilisé en local pour l'utilisation des classes
 
         # On convertit ici le dictionnaire de listes de dictionnaire en un dictionnaire de listes contenant des objet des classes User, Channel et Message
+        # Il aurait mieux valu créer 3 attributs self.users, self.channels,
+        # et self.messages. Vous auriez obtenu un typage plus fort :
+        # ici Python ne peut pas déterminer facilement le type des
+        # valeurs du dictionnaire server_local.
         for user1 in server1['users']:
             server_local["users"].append(User(user1["id"], user1['name']))
 
@@ -124,7 +131,10 @@ class LocalStorage:
         return server_local
 
 
-    def save(self, newserver:dict):
+    # Vous pouvez indiquer None en type de retour
+    # pour qu'un relecteur sache que l'absence de return n'est
+    # pas un oubli.
+    def save(self, newserver:dict) -> None:
 
         # il faut formater à nouveau pour avoir un server adapté au json
         server2={'users':[], 'channels':[], 'messages':[]}
@@ -156,6 +166,9 @@ class LocalStorage:
 
     def create_user(self, newname:str) -> int:
         server = self.load()
+        # Ce calcul ne fonctionne que si les ID sont strictement
+        # croissants dans la liste, ce qui n'est pas garanti.
+        # Il vaut mieux prendre le max des ids existants + 1
         newid = server['users'][-1].id + 1
         server['users'].append(User(newid, newname))
         self.save(server)
@@ -174,11 +187,13 @@ class LocalStorage:
         return newid
 
 
-    def get_messages(self):
+    def get_messages(self) -> list[Message]:
         return self.load()['messages']
     
-    def post_message(self, user_id:int, channel_id:int, content:str):
+    def post_message(self, user_id:int, channel_id:int, content:str) -> None:
         server=self.load()
+        # TB d'avoir pensé à faire cette vérification.
+        # Idéalement il faudrait la faire aussi pour users et channels
         if len(server['messages']) == 0:
             newid = 1
         else:
@@ -190,6 +205,7 @@ class LocalStorage:
         server = self.load()
         for chan in server['channels']:
             if chan.id == channel.id:
+                # TB d'avoir fait cette vérification
                 if user_id not in chan.members:   # on ajoute pas un utilisateur déjà présent
                     chan.members.append(user_id)
                 break  # on s'arête si on a ajouté qqlun ou si cette personne y était déjà
@@ -198,7 +214,7 @@ class LocalStorage:
 
 ##Fonctions de navigation
 
-def acceuil():
+def acceuil() -> User:
     clear_screen()
     
     # Titre et Bienvenue
@@ -232,7 +248,9 @@ def acceuil():
     # Cas 1 : Créer un nouveau compte
     if choice == 'n':
         ajout_utilisateur()
-        acceuil() # On recharge l'accueil après la création du nouveau compte
+        # N'oubliez pas les return, sinon l'utilisateur ne remontera
+        # pas jusqu'à la variable userlog
+        return acceuil() # On recharge l'accueil après la création du nouveau compte
 
     # Cas 2 : Quitter
     elif choice == 'q':
@@ -252,6 +270,7 @@ def acceuil():
         # Si on a trouvé quelqu'un
         if found_user:
             console.print(f"[bold green] Connexion réussie ! Bonjour {found_user.name}.[/bold green]")
+            # TB d'avoir pensé à la pause
             # Petite pause pour que l'utilisateur voie le message de succès
             time.sleep(1.5) 
             return found_user
@@ -260,7 +279,7 @@ def acceuil():
         else:
             console.print(Panel("[bold red] Utilisateur inconnu ![/bold red]", border_style="red"))
             input("Appuyez sur Entrée pour réessayer...")
-            acceuil() # On recommence
+            return acceuil() # On recommence
 
     
 def menu_principal():
@@ -431,6 +450,12 @@ def in_channel(channel: Channel):
                 alignment = "left"
 
             # Affichage du message avec la date et le contenu
+            # Vous gagneriez à personnaliser un peu l'affichage
+            # de la date. Idéalement :
+            # - pour le premier message d'un jour, vous affichez la date
+            #   sur une ligne dédiée
+            # - pour chaque message, vous n'affichez que l'heure et
+            #   les minutes, voire les secondes
             console.print(
                 f"[{mess.date}] {message_style} : {mess.mess}", 
                 justify=alignment
@@ -564,6 +589,9 @@ if __name__ == "__main__":
         storage = RemoteStorage(args.remote)
 
     else:
+        # Vous pouvez uiliser parser.print_help(), qui va automatiquement
+        # générer un message d'aide en fonction des paramètres
+        # que vous lui avez donné.
         console.print("Aucun mode spécifié.")
         console.print("Usage: python messenger.py --local filepath.json")
         console.print("   ou: python messenger.py --remote server_url")
